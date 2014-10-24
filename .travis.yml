@@ -1,0 +1,14 @@
+language: cpp
+
+env:
+  global:
+    - LIBRAW_GIT="git://github.com/LibRaw/LibRaw.git"
+    
+script:
+  - cd ..
+  - git clone $LIBRAW_GIT libraw
+  - cp -R LibRaw-cmake/* libraw
+  - cd libraw
+  - cmake .
+  - make
+  - sudo make install
