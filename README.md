@@ -1,6 +1,8 @@
 LibRaw-cmake
 ============
 
+[![Build Status](https://travis-ci.org/LibRaw/LibRaw-cmake.svg?branch=master)](https://travis-ci.org/LibRaw/LibRaw-cmake)
+
 This is a separate repository for LibRaw CMake support scripts.
 It is [unmaintained](https://github.com/LibRaw/LibRaw/issues/44#issuecomment-60344793) by the authors of LibRaw and relies solely on user contributions.
 The current community-maintainer of this repository is [Maik Riechert](https://github.com/neothemachine).
