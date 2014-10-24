@@ -10,3 +10,8 @@ The current community-maintainer of this repository is [Maik Riechert](https://g
 If you wish to contribute to it, please open an issue or submit a pull request in this repository. Do *not* submit issues or pull requests regarding CMake to the main [LibRaw repository](https://github.com/LibRaw/LibRaw). Also, try to keep CMake related discussions out of the [main forum](http://www.libraw.org/forum), instead use the issues for that.
 
 If you like to become a direct contributor with write permissions to this repository, please contact the [LibRaw authors](https://github.com/LibRaw).
+
+How to use
+----------
+
+Just copy the contents of this repository into the root LibRaw folder and run cmake as usual.
