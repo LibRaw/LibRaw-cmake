@@ -14,7 +14,7 @@
 # Copyright (c) 2009, Cyrille Berger, <cberger@cberger.net>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+# For details see the accompanying LICENSE file.
 
 
 # use pkg-config to get the directories and then use these values

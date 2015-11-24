@@ -29,7 +29,7 @@
 # Copyright (c) 2009, Sebastian Trueg, <trueg@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+# For details see the accompanying LICENSE file.
 
 IF (NOT _macroLogFeatureAlreadyIncluded)
    SET(_file ${CMAKE_BINARY_DIR}/MissingRequirements.txt)

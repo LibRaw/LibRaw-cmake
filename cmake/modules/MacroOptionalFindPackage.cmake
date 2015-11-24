@@ -10,7 +10,7 @@
 # Copyright (c) 2006-2010 Alexander Neundorf, <neundorf@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+# For details see the accompanying LICENSE file.
 
 # This is just a helper macro to set a bunch of variables empty.
 # We don't know whether the package uses UPPERCASENAME or CamelCaseName, so we try both:
