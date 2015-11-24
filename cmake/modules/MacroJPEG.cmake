@@ -4,12 +4,15 @@
 # JPEG_LIB_VERSION is set to version ID depending of libjpeg version detected.
 #
 # Copyright (c) 2010-2015, Gilles Caulier, <caulier dot gilles at gmail dot com>
+# Copyright (c) 2015, Maik Riechert, <maik dot riechert at arcor dot de>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying LICENSE file.
 #
 # check version of libjpeg so that we can use the appropriate dir
 # See bug #227313 for details
+#
+# 2015-11-24 Changed DETECT_JPEG() so that JPEG library is optional (Maik Riechert)
 
 function(CompileToCheckVersion LibId Ret)
 
@@ -39,7 +42,7 @@ endfunction()
 
 macro(DETECT_JPEG)
 
-    find_package(JPEG REQUIRED)
+    find_package(JPEG)
 
     if(JPEG_FOUND)
 
