@@ -586,7 +586,6 @@ IF(NOT WIN32)
     INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/COPYRIGHT
                         ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.CDDL
                         ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.LGPL
-                        ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.LibRaw.pdf
                         ${CMAKE_CURRENT_SOURCE_DIR}/Changelog.txt
             DESTINATION share/libraw
             COMPONENT main
