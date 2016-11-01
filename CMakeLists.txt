@@ -63,7 +63,7 @@ MESSAGE(STATUS "LibRaw SO version:     ${RAW_LIB_SO_VERSION_STRING}")
 
 # ==================================================================================================
 # Project Options
-
+OPTION(BUILD_SHARED_LIBS           "Build library as shared library                 (default=ON)"                 ON)
 OPTION(ENABLE_OPENMP               "Build library with OpenMP support               (default=ON)"                 ON)
 OPTION(ENABLE_LCMS                 "Build library with LCMS support                 (default=ON)"                 ON)
 OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"                 ON)
@@ -462,7 +462,7 @@ FOREACH(_curentfile ${libraw_LIB_SRCS})
     ENDIF()
 ENDFOREACH(_curentfile ${libraw_LIB_SRCS})
 
-ADD_LIBRARY(raw SHARED ${libraw_LIB_SRCS})
+ADD_LIBRARY(raw ${libraw_LIB_SRCS})
 
 TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
 
@@ -506,7 +506,7 @@ FOREACH(_curentfile ${libraw_r_LIB_SRCS})
     ENDIF()
 ENDFOREACH(_curentfile ${libraw_r_LIB_SRCS})
 
-ADD_LIBRARY(raw_r SHARED ${libraw_r_LIB_SRCS})
+ADD_LIBRARY(raw_r ${libraw_r_LIB_SRCS})
 
 TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
 
