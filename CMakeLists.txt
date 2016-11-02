@@ -85,6 +85,9 @@ SET(DEMOSAIC_PACK_GPL2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL2_RP
 SET(DEMOSAIC_PACK_GPL3_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL3_RPATH}")
 SET(RAWSPEED_PATH           "${CMAKE_CURRENT_SOURCE_DIR}/${RAWSPEED_RPATH}")
 
+SET(INSTALL_CMAKE_MODULE_PATH  "${CMAKE_ROOT}/Modules"  CACHE STRING
+    "Path to install cmake module              (default=${CMAKE_ROOT}/Modules)")
+
 # ==================================================================================================
 # General definitions rules
 
@@ -579,7 +582,7 @@ INSTALL(TARGETS raw_r
 
 # Install find cmake script to the system for client applications.
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
-        DESTINATION ${CMAKE_ROOT}/Modules)
+        DESTINATION ${INSTALL_CMAKE_MODULE_PATH})
 
 # Install doc data files.
 IF(NOT WIN32)
