@@ -371,7 +371,7 @@ ENDIF()
 # Create a config header for client application.
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/
                     ${CMAKE_CURRENT_SOURCE_DIR}/
                    )
 
