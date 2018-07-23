@@ -373,7 +373,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CM
 
 # Put the include dirs which are in the source or build tree
 # before all other include dirs, so the headers in the sources
-# are prefered over the already installed ones
+# are preferred over the already installed ones
 SET(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/
