@@ -62,6 +62,23 @@ MESSAGE(STATUS "LibRaw ID version:     ${RAW_LIB_VERSION_ID}")
 MESSAGE(STATUS "LibRaw SO version:     ${RAW_LIB_SO_VERSION_STRING}")
 
 # ==================================================================================================
+# General definitions rules
+
+SET(LIB_SUFFIX "" CACHE STRING "Define suffix of lib directory name (32/64)" )
+
+# To prevent warnings from M$ compiler
+IF(WIN32 AND MSVC)
+    ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+    ADD_DEFINITIONS(-D_ATL_SECURE_NO_WARNINGS)
+    ADD_DEFINITIONS(-D_AFX_SECURE_NO_WARNINGS)
+ENDIF()
+
+# Under Windows, use specific flag to compile.
+IF(WIN32)
+    ADD_DEFINITIONS(-DDJGPP)
+ENDIF()
+
+# ==================================================================================================
 # Project Options
 OPTION(BUILD_SHARED_LIBS           "Build library as shared library                 (default=ON)"                 ON)
 OPTION(ENABLE_OPENMP               "Build library with OpenMP support               (default=ON)"                 ON)
@@ -85,25 +102,8 @@ SET(DEMOSAIC_PACK_GPL2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL2_RP
 SET(DEMOSAIC_PACK_GPL3_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL3_RPATH}")
 SET(RAWSPEED_PATH           "${CMAKE_CURRENT_SOURCE_DIR}/${RAWSPEED_RPATH}")
 
-SET(INSTALL_CMAKE_MODULE_PATH  "${CMAKE_ROOT}/Modules"  CACHE STRING
-    "Path to install cmake module              (default=${CMAKE_ROOT}/Modules)")
-
-# ==================================================================================================
-# General definitions rules
-
-SET(LIB_SUFFIX "" CACHE STRING "Define suffix of lib directory name (32/64)" )
-
-# To prevent warnings from M$ compiler
-IF(WIN32 AND MSVC)
-    ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
-    ADD_DEFINITIONS(-D_ATL_SECURE_NO_WARNINGS)
-    ADD_DEFINITIONS(-D_AFX_SECURE_NO_WARNINGS)
-ENDIF()
-
-# Under Windows, use specific flag to compile.
-IF(WIN32)
-    ADD_DEFINITIONS(-DDJGPP)
-ENDIF()
+SET(INSTALL_CMAKE_MODULE_PATH  "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"  CACHE STRING
+    "Path to install cmake module              (default=lib${LIB_SUFFIX}/cmake/${PROJECT_NAME})")
 
 # -- Check dependencies --------------------------------------------------------------------------------
 
