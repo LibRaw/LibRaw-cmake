@@ -20,6 +20,9 @@ it under the terms of the one of two licenses as you choose:
 #ifndef __LIBRAW_CONFIG_H
 #define __LIBRAW_CONFIG_H
 
+/* Define to 1 if LibRaw have been compiled with DNG lossless codec support */
+#cmakedefine LIBRAW_USE_DNGLOSSLESSCODEC 1
+
 /* Define to 1 if LibRaw have been compiled with DNG lossy codec support */
 #cmakedefine LIBRAW_USE_DNGLOSSYCODEC 1
 

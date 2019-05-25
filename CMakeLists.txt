@@ -153,6 +153,19 @@ ENDIF()
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(LCMS_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_LCMS)
 
+# zlib library check
+
+FIND_PACKAGE(zlib)
+
+# Flag to use zlib with LibRaw DNG lossless codec
+IF(ZLIB_FOUND)
+    ADD_DEFINITIONS(-DUSE_ZLIB)
+    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+ENDIF()
+
+# For registration to libraw_config.h
+MACRO_BOOL_TO_01(ZLIB_FOUND LIBRAW_USE_DNGLOSSLESSCODEC)
+
 # JPEG library check
 
 DETECT_JPEG()
@@ -411,6 +424,12 @@ ELSE()
     MESSAGE(STATUS " Libraw will be compiled with RedCine codec support ........... NO")
 ENDIF()
 
+IF(ZLIB_FOUND)
+    MESSAGE(STATUS " Libraw will be compiled with DNG lossless codec support ...... YES")
+ELSE()
+    MESSAGE(STATUS " Libraw will be compiled with DNG lossless codec support ...... NO")
+ENDIF()
+
 IF(JPEG8_FOUND)
     MESSAGE(STATUS " Libraw will be compiled with DNG lossy codec support ......... YES")
 ELSE()
@@ -486,6 +505,10 @@ IF(LCMS_SUPPORT_CAN_BE_COMPILED)
     TARGET_LINK_LIBRARIES(raw ${LCMS2_LIBRARIES})
 ENDIF()
 
+IF(ZLIB_FOUND)
+    TARGET_LINK_LIBRARIES(raw ${ZLIB_LIBRARY})
+ENDIF()
+
 IF(JPEG8_FOUND)
     TARGET_LINK_LIBRARIES(raw ${JPEG_LIBRARY})
 ENDIF()
@@ -528,6 +551,10 @@ ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
     TARGET_LINK_LIBRARIES(raw_r ${LCMS2_LIBRARIES})
+ENDIF()
+
+IF(ZLIB_FOUND)
+    TARGET_LINK_LIBRARIES(raw_r ${ZLIB_LIBRARY})
 ENDIF()
 
 IF(JPEG8_FOUND)
