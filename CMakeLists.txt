@@ -157,14 +157,14 @@ MACRO_BOOL_TO_01(LCMS_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_LCMS)
 
 FIND_PACKAGE(zlib)
 
-# Flag to use zlib with LibRaw DNG lossless codec
+# Flag to use zlib with LibRaw DNG deflate codec
 IF(ZLIB_FOUND)
     ADD_DEFINITIONS(-DUSE_ZLIB)
     INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 ENDIF()
 
 # For registration to libraw_config.h
-MACRO_BOOL_TO_01(ZLIB_FOUND LIBRAW_USE_DNGLOSSLESSCODEC)
+MACRO_BOOL_TO_01(ZLIB_FOUND LIBRAW_USE_DNGDEFLATECODEC)
 
 # JPEG library check
 
@@ -425,9 +425,9 @@ ELSE()
 ENDIF()
 
 IF(ZLIB_FOUND)
-    MESSAGE(STATUS " Libraw will be compiled with DNG lossless codec support ...... YES")
+    MESSAGE(STATUS " Libraw will be compiled with DNG deflate codec support ....... YES")
 ELSE()
-    MESSAGE(STATUS " Libraw will be compiled with DNG lossless codec support ...... NO")
+    MESSAGE(STATUS " Libraw will be compiled with DNG deflate codec support ....... NO")
 ENDIF()
 
 IF(JPEG8_FOUND)
