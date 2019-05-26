@@ -155,7 +155,7 @@ MACRO_BOOL_TO_01(LCMS_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_LCMS)
 
 # zlib library check
 
-FIND_PACKAGE(zlib)
+FIND_PACKAGE(ZLIB)
 
 # Flag to use zlib with LibRaw DNG deflate codec
 IF(ZLIB_FOUND)
