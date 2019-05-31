@@ -31,17 +31,34 @@ FIND_PATH(LibRaw_INCLUDE_DIR libraw.h
           PATH_SUFFIXES libraw
          )
 
-FIND_LIBRARY(LibRaw_LIBRARIES NAMES raw
+FIND_LIBRARY(LibRaw_LIBRARY_RELEASE NAMES raw
              HINTS
              ${PC_LIBRAW_LIBDIR}
              ${PC_LIBRAW_LIBRARY_DIRS}
             )
 
-FIND_LIBRARY(LibRaw_r_LIBRARIES NAMES raw_r
+FIND_LIBRARY(LibRaw_LIBRARY_DEBUG NAMES rawd
+             HINTS
+             ${PC_LIBRAW_LIBDIR}
+             ${PC_LIBRAW_LIBRARY_DIRS}
+            )
+
+include(SelectLibraryConfigurations)
+select_library_configurations(LibRaw)
+
+FIND_LIBRARY(LibRaw_r_LIBRARY_RELEASE NAMES raw_r
              HINTS
              ${PC_LIBRAW_R_LIBDIR}
              ${PC_LIBRAW_R_LIBRARY_DIRS}
             )
+
+FIND_LIBRARY(LibRaw_r_LIBRARY_DEBUG NAMES raw_rd
+             HINTS
+             ${PC_LIBRAW_R_LIBDIR}
+             ${PC_LIBRAW_R_LIBRARY_DIRS}
+            )
+
+select_library_configurations(LibRaw_r)
 
 IF(LibRaw_INCLUDE_DIR)
    FILE(READ ${LibRaw_INCLUDE_DIR}/libraw_version.h _libraw_version_content)
