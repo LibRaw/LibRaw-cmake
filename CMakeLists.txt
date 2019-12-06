@@ -671,7 +671,7 @@ ENDMACRO(LIBRAW_BUILD_SAMPLES)
 IF(ENABLE_EXAMPLES)
 
     LIBRAW_BUILD_SAMPLES(simple_dcraw.cpp raw)
-    LIBRAW_BUILD_SAMPLES(mem_image.cpp raw)
+    LIBRAW_BUILD_SAMPLES(mem_image_sample.cpp raw)
     LIBRAW_BUILD_SAMPLES(dcraw_emu.cpp raw)
     LIBRAW_BUILD_SAMPLES(4channels.cpp raw)
     LIBRAW_BUILD_SAMPLES(unprocessed_raw.cpp raw)
