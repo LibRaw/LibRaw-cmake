@@ -1,12 +1,21 @@
 language: cpp
 dist: bionic
 
+addons:
+  apt:
+    update: true
+    sources:
+      - sourceline: "ppa:ubuntu-toolchain-r/test"
+    packages:
+      - gcc-10 g++-10
+
 env:
   global:
     - LIBRAW_GIT="git://github.com/LibRaw/LibRaw.git"
     - LIBRAW_GPL2_GIT="git://github.com/LibRaw/LibRaw-demosaic-pack-GPL2.git"
     - LIBRAW_GPL3_GIT="git://github.com/LibRaw/LibRaw-demosaic-pack-GPL3.git"
-    
+    - CC=gcc-10 CXX=g++-10
+
 script:
   - cd ..
   - git clone $LIBRAW_GIT
