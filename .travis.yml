@@ -1,5 +1,8 @@
 language: cpp
 dist: bionic
+arch:
+ - amd64
+ - arm64
 
 addons:
   apt:
