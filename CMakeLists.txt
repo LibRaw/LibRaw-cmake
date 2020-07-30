@@ -116,7 +116,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 INCLUDE(MacroBoolTo01)
 INCLUDE(MacroLogFeature)
 INCLUDE(MacroOptionalFindPackage)
-INCLUDE(MacroJPEG)
 
 # Math library check
 
@@ -160,21 +159,21 @@ MACRO_BOOL_TO_01(LCMS_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_LCMS)
 # zlib library check
 
 FIND_PACKAGE(ZLIB)
+FIND_PACKAGE(JPEG)
 
 # Flag to use zlib with LibRaw DNG deflate codec
 IF(ZLIB_FOUND)
     ADD_DEFINITIONS(-DUSE_ZLIB)
-    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
+#    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
 ENDIF()
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(ZLIB_FOUND LIBRAW_USE_DNGDEFLATECODEC)
 
 # JPEG library check
-
-DETECT_JPEG()
+find_package(JPEG)
 IF(JPEG_FOUND)
-    if (${JPEG_LIB_VERSION} LESS 80)
+    if (${JPEG_VERSION} LESS 80)
         set(JPEG8_FOUND FALSE)
     else()
         set(JPEG8_FOUND TRUE)
@@ -187,7 +186,6 @@ MACRO_LOG_FEATURE(JPEG8_FOUND "libjpeg" "JPEG image format support" "http://www.
 IF(JPEG8_FOUND)
     ADD_DEFINITIONS(-DUSE_JPEG)
     ADD_DEFINITIONS(-DUSE_JPEG8)
-    INCLUDE_DIRECTORIES(${JPEG_INCLUDE_DIR})
 ENDIF()
 
 # For registration to libraw_config.h
@@ -494,11 +492,11 @@ IF(LCMS_SUPPORT_CAN_BE_COMPILED)
 ENDIF()
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${ZLIB_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw ZLIB::ZLIB)
 ENDIF()
 
 IF(JPEG8_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${JPEG_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw JPEG::JPEG)
 ENDIF()
 
 IF(JASPER_FOUND)
@@ -543,7 +541,7 @@ IF(LCMS_SUPPORT_CAN_BE_COMPILED)
 ENDIF()
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ${ZLIB_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw_r ZLIB::ZLIB)
 ENDIF()
 
 IF(JPEG8_FOUND)
@@ -625,6 +623,7 @@ ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake_uni
 # add a small macro so that this is a bit cleaner
 MACRO(LIBRAW_BUILD_SAMPLES)
 
+    project(${_target} CXX)
     SET(_filename ${ARGV0})
     SET(_rawlib ${ARGV1})
     STRING(REPLACE "." ";" _temp ${_filename})
