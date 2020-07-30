@@ -1,0 +1,3 @@
+[submodule "libraw"]
+	path = libraw
+	url = ../../LibRaw/LibRaw

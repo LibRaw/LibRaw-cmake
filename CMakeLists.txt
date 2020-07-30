@@ -22,14 +22,14 @@
 #
 # ============================================================
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.3)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1..11)
 
-PROJECT(libraw)
+PROJECT(libraw CXX)
 
 # ==================================================================================================
 # Library version info extraction
 
-FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_version.h _libraw_version_content)
+FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_version.h _libraw_version_content)
 
 # API version strings
 STRING(REGEX MATCH "#define LIBRAW_MAJOR_VERSION[ \t]*([0-9]*)\n" _version_major_match ${_libraw_version_content})
@@ -193,24 +193,11 @@ ENDIF()
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(JPEG8_FOUND LIBRAW_USE_DNGLOSSYCODEC)
 
-# OpenMP library check
-
-SET(OPENMP_FOUND false)
-
 IF(ENABLE_OPENMP)
-    # OpenMP library detection (requires CMake >= 2.6.3)
-    MACRO_OPTIONAL_FIND_PACKAGE(OpenMP)
+    find_package(OpenMP REQUIRED)
+ENDIF(ENABLE_OPENMP)
 
-    IF(OPENMP_FOUND)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        IF("${OpenMP_CXX_FLAGS}" STREQUAL "-fopenmp")
-            SET(OPENMP_LDFLAGS "-lgomp")
-        ENDIF()
-        IF("${OpenMP_CXX_FLAGS}" STREQUAL "-xopenmp")
-            SET(OPENMP_LDFLAGS "-xopenmp")
-        ENDIF()
-    ENDIF()
-ENDIF()
+set(OPENMP_FOUND TARGET OpenMP::OpenMP_CXX)
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(OPENMP_FOUND LIBRAW_USE_OPENMP)
@@ -282,50 +269,50 @@ IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
 
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS} ${PTHREADS_DEFINITIONS})
 
-    SET(librawspeed_LIB_SRCS ${RAWSPEED_PATH}/ArwDecoder.cpp
-                             ${RAWSPEED_PATH}/BitPumpJPEG.cpp
-                             ${RAWSPEED_PATH}/BitPumpMSB.cpp
-                             ${RAWSPEED_PATH}/BitPumpMSB32.cpp
-                             ${RAWSPEED_PATH}/BitPumpPlain.cpp
-                             ${RAWSPEED_PATH}/BlackArea.cpp
-                             ${RAWSPEED_PATH}/ByteStream.cpp
-                             ${RAWSPEED_PATH}/ByteStreamSwap.cpp
-                             ${RAWSPEED_PATH}/Camera.cpp
-                             ${RAWSPEED_PATH}/CameraMetaData.cpp
-                             ${RAWSPEED_PATH}/CameraMetadataException.cpp
-                             ${RAWSPEED_PATH}/CameraSensorInfo.cpp
-                             ${RAWSPEED_PATH}/ColorFilterArray.cpp
-                             ${RAWSPEED_PATH}/Common.cpp
-                             ${RAWSPEED_PATH}/Cr2Decoder.cpp
-                             ${RAWSPEED_PATH}/DngDecoder.cpp
-                             ${RAWSPEED_PATH}/DngDecoderSlices.cpp
-                             ${RAWSPEED_PATH}/DngOpcodes.cpp
-                             ${RAWSPEED_PATH}/FileIOException.cpp
-                             ${RAWSPEED_PATH}/FileMap.cpp
-                             ${RAWSPEED_PATH}/IOException.cpp
-                             ${RAWSPEED_PATH}/LJpegDecompressor.cpp
-                             ${RAWSPEED_PATH}/LJpegPlain.cpp
-                             ${RAWSPEED_PATH}/NefDecoder.cpp
-                             ${RAWSPEED_PATH}/NikonDecompressor.cpp
-                             ${RAWSPEED_PATH}/OrfDecoder.cpp
-                             ${RAWSPEED_PATH}/PefDecoder.cpp
-                             ${RAWSPEED_PATH}/PentaxDecompressor.cpp
-                             ${RAWSPEED_PATH}/RawDecoder.cpp
-                             ${RAWSPEED_PATH}/RawDecoderException.cpp
-                             ${RAWSPEED_PATH}/RawImage.cpp
-                             ${RAWSPEED_PATH}/RawImageDataFloat.cpp
-                             ${RAWSPEED_PATH}/RawImageDataU16.cpp
-                             ${RAWSPEED_PATH}/RawParser.cpp
-                             ${RAWSPEED_PATH}/Rw2Decoder.cpp
-                             ${RAWSPEED_PATH}/SrwDecoder.cpp
-                             ${RAWSPEED_PATH}/TiffEntry.cpp
-                             ${RAWSPEED_PATH}/TiffEntryBE.cpp
-                             ${RAWSPEED_PATH}/TiffIFD.cpp
-                             ${RAWSPEED_PATH}/TiffIFDBE.cpp
-                             ${RAWSPEED_PATH}/TiffParser.cpp
-                             ${RAWSPEED_PATH}/TiffParserException.cpp
-                             ${RAWSPEED_PATH}/TiffParserHeaderless.cpp
-                             ${RAWSPEED_PATH}/TiffParserOlympus.cpp
+    SET(librawspeed_LIB_SRCS ${RAWSPEED_PATH}/libraw/ArwDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/BitPumpJPEG.cpp
+                             ${RAWSPEED_PATH}/libraw/BitPumpMSB.cpp
+                             ${RAWSPEED_PATH}/libraw/BitPumpMSB32.cpp
+                             ${RAWSPEED_PATH}/libraw/BitPumpPlain.cpp
+                             ${RAWSPEED_PATH}/libraw/BlackArea.cpp
+                             ${RAWSPEED_PATH}/libraw/ByteStream.cpp
+                             ${RAWSPEED_PATH}/libraw/ByteStreamSwap.cpp
+                             ${RAWSPEED_PATH}/libraw/Camera.cpp
+                             ${RAWSPEED_PATH}/libraw/CameraMetaData.cpp
+                             ${RAWSPEED_PATH}/libraw/CameraMetadataException.cpp
+                             ${RAWSPEED_PATH}/libraw/CameraSensorInfo.cpp
+                             ${RAWSPEED_PATH}/libraw/ColorFilterArray.cpp
+                             ${RAWSPEED_PATH}/libraw/Common.cpp
+                             ${RAWSPEED_PATH}/libraw/Cr2Decoder.cpp
+                             ${RAWSPEED_PATH}/libraw/DngDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/DngDecoderSlices.cpp
+                             ${RAWSPEED_PATH}/libraw/DngOpcodes.cpp
+                             ${RAWSPEED_PATH}/libraw/FileIOException.cpp
+                             ${RAWSPEED_PATH}/libraw/FileMap.cpp
+                             ${RAWSPEED_PATH}/libraw/IOException.cpp
+                             ${RAWSPEED_PATH}/libraw/LJpegDecompressor.cpp
+                             ${RAWSPEED_PATH}/libraw/LJpegPlain.cpp
+                             ${RAWSPEED_PATH}/libraw/NefDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/NikonDecompressor.cpp
+                             ${RAWSPEED_PATH}/libraw/OrfDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/PefDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/PentaxDecompressor.cpp
+                             ${RAWSPEED_PATH}/libraw/RawDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/RawDecoderException.cpp
+                             ${RAWSPEED_PATH}/libraw/RawImage.cpp
+                             ${RAWSPEED_PATH}/libraw/RawImageDataFloat.cpp
+                             ${RAWSPEED_PATH}/libraw/RawImageDataU16.cpp
+                             ${RAWSPEED_PATH}/libraw/RawParser.cpp
+                             ${RAWSPEED_PATH}/libraw/Rw2Decoder.cpp
+                             ${RAWSPEED_PATH}/libraw/SrwDecoder.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffEntry.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffEntryBE.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffIFD.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffIFDBE.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffParser.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffParserException.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffParserHeaderless.cpp
+                             ${RAWSPEED_PATH}/libraw/TiffParserOlympus.cpp
     )
 
 ENDIF()
@@ -390,7 +377,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CM
 SET(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/
-                    ${CMAKE_CURRENT_SOURCE_DIR}/
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw
                    )
 
 # -- Log messages about configuration ------------------------------------------------------------------
@@ -465,12 +452,12 @@ MESSAGE(STATUS "")
 
 # -- Dedicated libraw target which not support multi-threading ---------------------------------------
 
-SET(libraw_LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/internal/dcraw_common.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/internal/dcraw_fileio.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/internal/demosaic_packs.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/libraw_cxx.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/libraw_c_api.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/libraw_datastream.cpp
+SET(libraw_LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/dcraw_common.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/dcraw_fileio.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/demosaic_packs.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/src/libraw_cxx.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/src/libraw_c_api.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/src/libraw_datastream.cpp
    )
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
@@ -490,6 +477,7 @@ FOREACH(_curentfile ${libraw_LIB_SRCS})
 ENDFOREACH(_curentfile ${libraw_LIB_SRCS})
 
 ADD_LIBRARY(raw ${libraw_LIB_SRCS})
+target_include_directories(raw PRIVATE libraw/internal)
 
 TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
 
@@ -498,7 +486,7 @@ IF(MINGW)
 ENDIF()
 
 IF(OPENMP_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${OPENMP_LDFLAGS})
+    target_link_libraries(raw OpenMP::OpenMP_CXX)
 ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
@@ -540,13 +528,14 @@ ENDFOREACH(_curentfile ${libraw_r_LIB_SRCS})
 ADD_LIBRARY(raw_r ${libraw_r_LIB_SRCS})
 
 TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
+target_include_directories(raw_r PRIVATE libraw/internal)
 
 IF(MINGW)
     TARGET_LINK_LIBRARIES(raw_r ws2_32)
 ENDIF()
 
 IF(OPENMP_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ${OPENMP_LDFLAGS})
+    TARGET_LINK_LIBRARIES(raw_r OpenMP::OpenMP_CXX)
 ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
@@ -587,13 +576,13 @@ IF(NOT WIN32)
 ENDIF()
 
 # Install Shared header files.
-INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_alloc.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_const.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_datastream.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_internal.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_types.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_version.h
+INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_alloc.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_const.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_datastream.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_internal.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_types.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_version.h
                     ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h
         DESTINATION include/libraw
         COMPONENT   Devel
@@ -641,19 +630,19 @@ MACRO(LIBRAW_BUILD_SAMPLES)
     STRING(REPLACE "." ";" _temp ${_filename})
     LIST(GET _temp 0 _target)
 
-    SET(${_target}_SRCS samples/${_filename})
+    SET(${_target}_SRCS libraw/samples/${_filename})
     SET_SOURCE_FILES_PROPERTIES(${${_target}_SRCS} PROPERTIES COMPILE_FLAGS -w)
 
     ADD_EXECUTABLE(${_target} ${${_target}_SRCS})
 
-    TARGET_LINK_LIBRARIES(${_target} ${_rawlib})
+    TARGET_LINK_LIBRARIES(${_target} PRIVATE ${_rawlib})
 
     IF(OPENMP_FOUND)
-        TARGET_LINK_LIBRARIES(${_target} ${OPENMP_LDFLAGS})
+        target_link_libraries(${_target} PUBLIC OpenMP::OpenMP_CXX)
     ENDIF()
 
     IF (${_rawlib} MATCHES "raw_r")
-        TARGET_LINK_LIBRARIES(${_target} ${PTHREADS_LIBRARY})
+        TARGET_LINK_LIBRARIES(${_target} PUBLIC ${PTHREADS_LIBRARY})
     ENDIF()
 
     IF(WIN32)
