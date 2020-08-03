@@ -24,8 +24,6 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.12..16)
 
-PROJECT(libraw CXX)
-
 # ==================================================================================================
 # Library version info extraction
 
@@ -60,6 +58,8 @@ SET(RAW_LIB_SO_VERSION_STRING "${RAW_LIB_SO_CUR_VERSION}.${RAW_LIB_SO_REV_VERSIO
 MESSAGE(STATUS "LibRaw string version: ${RAW_LIB_VERSION_STRING}")
 MESSAGE(STATUS "LibRaw ID version:     ${RAW_LIB_VERSION_ID}")
 MESSAGE(STATUS "LibRaw SO version:     ${RAW_LIB_SO_VERSION_STRING}")
+
+project(libraw VERSION ${RAW_LIB_VERSION_STRING} LANGUAGES CXX)
 
 # ==================================================================================================
 # Project Options
