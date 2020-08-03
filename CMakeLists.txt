@@ -480,8 +480,14 @@ FOREACH(_curentfile ${libraw_LIB_SRCS})
     ENDIF()
 ENDFOREACH(_curentfile ${libraw_LIB_SRCS})
 
-ADD_LIBRARY(raw ${libraw_LIB_SRCS})
-target_include_directories(raw PRIVATE libraw/internal)
+add_library(raw ${libraw_LIB_SRCS})
+add_library(libraw::libraw ALIAS raw)
+
+target_include_directories(raw
+        PUBLIC
+            $<INSTALL_INTERFACE:libraw>
+            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libraw>
+        PRIVATE libraw/internal)
 
 TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
 
@@ -543,7 +549,11 @@ ELSE()
 ENDIF()
 
 TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
-target_include_directories(raw_r PRIVATE libraw/internal)
+target_include_directories(raw_r
+        PUBLIC
+        $<INSTALL_INTERFACE:libraw>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libraw>
+        PRIVATE libraw/internal)
 
 IF(MINGW)
     TARGET_LINK_LIBRARIES(raw_r ws2_32)
