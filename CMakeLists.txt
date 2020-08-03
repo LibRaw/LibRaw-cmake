@@ -445,6 +445,12 @@ ELSE()
     MESSAGE(STATUS " Libraw will be compiled with debug message from dcraw ........ NO")
 ENDIF()
 
+IF(BUILD_SHARED_LIBS)
+    MESSAGE(STATUS " Libraw will be compiled as a shared library")
+ELSE()
+    MESSAGE(STATUS " Libraw will be compiled as a static library")
+ENDIF()
+
 MESSAGE(STATUS "----------------------------------------------------------------------------------")
 MESSAGE(STATUS "")
 
@@ -515,15 +521,26 @@ SET_TARGET_PROPERTIES(raw PROPERTIES OUTPUT_NAME "raw")
 
 SET(libraw_r_LIB_SRCS ${libraw_LIB_SRCS})
 
-FOREACH(_curentfile ${libraw_r_LIB_SRCS})
-    IF(WIN32 AND MSVC)
-        SET_SOURCE_FILES_PROPERTIES(${_curentfile} PROPERTIES COMPILE_FLAGS "-w")
-    ELSE()
-        SET_SOURCE_FILES_PROPERTIES(${_curentfile} PROPERTIES COMPILE_FLAGS "-w -fPIC -O4")
-    ENDIF()
-ENDFOREACH(_curentfile ${libraw_r_LIB_SRCS})
-
 ADD_LIBRARY(raw_r ${libraw_r_LIB_SRCS})
+add_library(libraw::libraw_r ALIAS raw_r)
+
+IF(WIN32 AND MSVC)
+    set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w")
+    set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w")
+ELSE()
+    set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w -O4")
+    set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w -O4")
+
+    # Always build position-independent code (PIC), even when building Ceres as a
+    # static library so that shared libraries can link against it, not just
+    # executables (PIC does not apply on Windows).
+    if(NOT BUILD_SHARED_LIBS)
+        # Use set_target_properties() not append_target_property() here as
+        # POSITION_INDEPENDENT_CODE is a binary ON/OFF switch.
+        set_target_properties(raw PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    endif()
+ENDIF()
 
 TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
 target_include_directories(raw_r PRIVATE libraw/internal)
