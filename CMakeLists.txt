@@ -74,13 +74,13 @@ OPTION(ENABLE_DCRAW_DEBUG          "Build library with debug message from dcraw 
 option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets (default=ON)"        ON)
 
 SET(DEMOSAIC_PACK_GPL2_RPATH "LibRaw-demosaic-pack-GPL2" CACHE STRING
-    "Relavive path to extra Demosaic pack GPL2 (default=LibRaw-demosaic-pack-GPL2)")
+    "Relative path to extra Demosaic pack GPL2 (default=LibRaw-demosaic-pack-GPL2)")
 
-SET(DEMOSAIC_PACK_GPL3_RPATH "LibRaw-demosaic-pack-GPL3" CACHE STRING 
-    "Relavive path to extra Demosaic pack GPL3 (default=LibRaw-demosaic-pack-GPL3)")
+SET(DEMOSAIC_PACK_GPL3_RPATH "LibRaw-demosaic-pack-GPL3" CACHE STRING
+    "Relative path to extra Demosaic pack GPL3 (default=LibRaw-demosaic-pack-GPL3)")
 
-SET(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING 
-    "Relavive path to extra RawSpeed codec     (default=RawSpeed)")
+SET(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING
+    "Relative path to extra RawSpeed codec     (default=RawSpeed)")
 
 SET(DEMOSAIC_PACK_GPL2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL2_RPATH}")
 SET(DEMOSAIC_PACK_GPL3_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL3_RPATH}")
@@ -449,7 +449,7 @@ ENDIF()
 MESSAGE(STATUS "----------------------------------------------------------------------------------")
 MESSAGE(STATUS "")
 
-# -- Dedicated libraw target which not support multi-threading ---------------------------------------
+# -- Dedicated libraw target which does not support multi-threading ---------------------------------------
 
 SET(libraw_LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/dcraw_common.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/dcraw_fileio.cpp
