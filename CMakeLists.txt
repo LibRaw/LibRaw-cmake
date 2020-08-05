@@ -24,6 +24,15 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.12..16)
 
+
+# Determine if libraw is built as a subproject (using add_subdirectory)
+# or if it is the master project.
+set(MASTER_PROJECT OFF)
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(MASTER_PROJECT ON)
+    message(STATUS "CMake version: ${CMAKE_VERSION}")
+endif ()
+
 # ==================================================================================================
 # Library version info extraction
 
@@ -66,12 +75,13 @@ project(libraw VERSION ${RAW_LIB_VERSION_STRING} LANGUAGES CXX)
 OPTION(BUILD_SHARED_LIBS           "Build library as shared library                 (default=ON)"                 ON)
 OPTION(ENABLE_OPENMP               "Build library with OpenMP support               (default=ON)"                 ON)
 OPTION(ENABLE_LCMS                 "Build library with LCMS support                 (default=ON)"                 ON)
-OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"                 ON)
+OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"                 ${MASTER_PROJECT})
 OPTION(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec support (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL2   "Build library with extra Demosaic pack GPL2     (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL3   "Build library with extra Demosaic pack GPL3     (default=OFF)"                OFF)
 OPTION(ENABLE_DCRAW_DEBUG          "Build library with debug message from dcraw     (default=OFF)"                OFF)
-option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets (default=ON)"        ON)
+option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets"        ${MASTER_PROJECT})
+option(LIBRAW_INSTALL              "Generate the install target."                                    ${MASTER_PROJECT})
 
 SET(DEMOSAIC_PACK_GPL2_RPATH "LibRaw-demosaic-pack-GPL2" CACHE STRING
     "Relative path to extra Demosaic pack GPL2 (default=LibRaw-demosaic-pack-GPL2)")
@@ -588,6 +598,7 @@ SET_TARGET_PROPERTIES(raw_r PROPERTIES SOVERSION   ${RAW_LIB_SO_CUR_VERSION})
 SET_TARGET_PROPERTIES(raw_r PROPERTIES OUTPUT_NAME "raw_r")
 
 # -- Files to install -------------------------------------------------------------------------------------
+if (LIBRAW_INSTALL)
 
 # Configure and install data file for packaging.
 IF(NOT WIN32)
@@ -640,6 +651,7 @@ IF(NOT WIN32)
             COMPONENT main
            )
 ENDIF()
+endif(LIBRAW_INSTALL)
 
 # Uninstall rules
 IF(LIBRAW_UNINSTALL_TARGET)
