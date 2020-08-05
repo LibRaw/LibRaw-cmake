@@ -14,4 +14,11 @@ If you like to become a direct contributor with write permissions to this reposi
 How to use
 ----------
 
-Just copy the contents of this repository into the root LibRaw folder and run cmake as usual.
+Clone the repo and make sure that the libraw git submodule is cloned as well:
+
+`git clone https://github.com/LibRaw/LibRaw-cmake.git --recursive`
+ 
+ Or, if it has already been cloned, init the submodule by:
+
+`git submodule update --init`
+ 
