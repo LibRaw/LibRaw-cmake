@@ -645,7 +645,7 @@ INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
 
 # Install doc data files.
 IF(NOT WIN32)
-    INSTALL(FILES       ${LIBRAW_PATH}/libraw/COPYRIGHT
+    INSTALL(FILES       ${LIBRAW_PATH}/COPYRIGHT
                         ${LIBRAW_PATH}/LICENSE.CDDL
                         ${LIBRAW_PATH}/LICENSE.LGPL
                         ${LIBRAW_PATH}/Changelog.txt
