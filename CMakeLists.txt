@@ -77,7 +77,7 @@ project(libraw VERSION ${RAW_LIB_VERSION_STRING} LANGUAGES CXX)
 OPTION(BUILD_SHARED_LIBS           "Build library as shared library                 (default=ON)"                 ON)
 OPTION(ENABLE_OPENMP               "Build library with OpenMP support               (default=ON)"                 ON)
 OPTION(ENABLE_LCMS                 "Build library with LCMS support                 (default=ON)"                 ON)
-OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"                 ${MASTER_PROJECT})
+OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"    ${MASTER_PROJECT})
 OPTION(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec support (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL2   "Build library with extra Demosaic pack GPL2     (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL3   "Build library with extra Demosaic pack GPL3     (default=OFF)"                OFF)
@@ -549,7 +549,7 @@ ELSE()
     set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w -O4")
     set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w -O4")
 
-    # Always build position-independent code (PIC), even when building Ceres as a
+    # Always build position-independent code (PIC), even when building Libraw as a
     # static library so that shared libraries can link against it, not just
     # executables (PIC does not apply on Windows).
     if(NOT BUILD_SHARED_LIBS)
@@ -646,9 +646,9 @@ INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
 # Install doc data files.
 IF(NOT WIN32)
     INSTALL(FILES       ${LIBRAW_PATH}/libraw/COPYRIGHT
-            ${LIBRAW_PATH}/LICENSE.CDDL
-            ${LIBRAW_PATH}/LICENSE.LGPL
-            ${LIBRAW_PATH}/Changelog.txt
+                        ${LIBRAW_PATH}/LICENSE.CDDL
+                        ${LIBRAW_PATH}/LICENSE.LGPL
+                        ${LIBRAW_PATH}/Changelog.txt
             DESTINATION share/libraw
             COMPONENT main
            )
@@ -666,7 +666,6 @@ ENDIF(LIBRAW_UNINSTALL_TARGET)
 # add a small macro so that this is a bit cleaner
 MACRO(LIBRAW_BUILD_SAMPLES)
 
-    project(${_target} CXX)
     SET(_filename ${ARGV0})
     SET(_rawlib ${ARGV1})
     STRING(REPLACE "." ";" _temp ${_filename})
