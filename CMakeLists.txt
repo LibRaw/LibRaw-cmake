@@ -33,10 +33,12 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     message(STATUS "CMake version: ${CMAKE_VERSION}")
 endif ()
 
+set(LIBRAW_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Relative path to libraw directory (default=CMAKE_CURRENT_SOURCE_DIR)")
+
 # ==================================================================================================
 # Library version info extraction
 
-FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_version.h _libraw_version_content)
+FILE(READ ${LIBRAW_PATH}/libraw/libraw_version.h _libraw_version_content)
 
 # API version strings
 STRING(REGEX MATCH "#define LIBRAW_MAJOR_VERSION[ \t]*([0-9]*)\n" _version_major_match ${_libraw_version_content})
@@ -385,7 +387,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CM
 SET(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw
+                    ${LIBRAW_PATH}/libraw
                    )
 
 # -- Log messages about configuration ------------------------------------------------------------------
@@ -466,12 +468,12 @@ MESSAGE(STATUS "")
 
 # -- Dedicated libraw target which does not support multi-threading ---------------------------------------
 
-SET(libraw_LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/dcraw_common.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/dcraw_fileio.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/internal/demosaic_packs.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/src/libraw_cxx.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/src/libraw_c_api.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/src/libraw_datastream.cpp
+SET(libraw_LIB_SRCS ${LIBRAW_PATH}/internal/dcraw_common.cpp
+                    ${LIBRAW_PATH}/internal/dcraw_fileio.cpp
+                    ${LIBRAW_PATH}/internal/demosaic_packs.cpp
+                    ${LIBRAW_PATH}/src/libraw_cxx.cpp
+                    ${LIBRAW_PATH}/src/libraw_c_api.cpp
+                    ${LIBRAW_PATH}/src/libraw_datastream.cpp
    )
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
@@ -496,7 +498,7 @@ add_library(libraw::libraw ALIAS raw)
 target_include_directories(raw
         PUBLIC
             $<INSTALL_INTERFACE:libraw>
-            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libraw>
+            $<BUILD_INTERFACE:${LIBRAW_PATH}>
         PRIVATE libraw/internal)
 
 TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
@@ -562,7 +564,7 @@ TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
 target_include_directories(raw_r
         PUBLIC
         $<INSTALL_INTERFACE:libraw>
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libraw>
+        $<BUILD_INTERFACE:${LIBRAW_PATH}>
         PRIVATE libraw/internal)
 
 IF(MINGW)
@@ -612,14 +614,14 @@ IF(NOT WIN32)
 ENDIF()
 
 # Install Shared header files.
-INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_alloc.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_const.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_datastream.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_internal.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_types.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw/libraw_version.h
-                    ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h
+INSTALL(FILES       ${LIBRAW_PATH}/libraw/libraw.h
+                    ${LIBRAW_PATH}/libraw/libraw_alloc.h
+                    ${LIBRAW_PATH}/libraw/libraw_const.h
+                    ${LIBRAW_PATH}/libraw/libraw_datastream.h
+                    ${LIBRAW_PATH}/libraw/libraw_internal.h
+                    ${LIBRAW_PATH}/libraw/libraw_types.h
+                    ${LIBRAW_PATH}/libraw/libraw_version.h
+                    ${LIBRAW_PATH}/libraw_config.h
         DESTINATION include/libraw
         COMPONENT   Devel
        )
@@ -643,10 +645,10 @@ INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
 
 # Install doc data files.
 IF(NOT WIN32)
-    INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/libraw/COPYRIGHT
-            ${CMAKE_CURRENT_SOURCE_DIR}/libraw/LICENSE.CDDL
-            ${CMAKE_CURRENT_SOURCE_DIR}/libraw/LICENSE.LGPL
-            ${CMAKE_CURRENT_SOURCE_DIR}/libraw/Changelog.txt
+    INSTALL(FILES       ${LIBRAW_PATH}/libraw/COPYRIGHT
+            ${LIBRAW_PATH}/LICENSE.CDDL
+            ${LIBRAW_PATH}/LICENSE.LGPL
+            ${LIBRAW_PATH}/Changelog.txt
             DESTINATION share/libraw
             COMPONENT main
            )
@@ -670,7 +672,7 @@ MACRO(LIBRAW_BUILD_SAMPLES)
     STRING(REPLACE "." ";" _temp ${_filename})
     LIST(GET _temp 0 _target)
 
-    SET(${_target}_SRCS libraw/samples/${_filename})
+    SET(${_target}_SRCS ${LIBRAW_PATH}/samples/${_filename})
     SET_SOURCE_FILES_PROPERTIES(${${_target}_SRCS} PROPERTIES COMPILE_FLAGS -w)
 
     ADD_EXECUTABLE(${_target} ${${_target}_SRCS})
