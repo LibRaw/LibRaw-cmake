@@ -207,10 +207,8 @@ IF(ENABLE_OPENMP)
     find_package(OpenMP REQUIRED)
 ENDIF(ENABLE_OPENMP)
 
-set(OPENMP_FOUND TARGET OpenMP::OpenMP_CXX)
-
 # For registration to libraw_config.h
-MACRO_BOOL_TO_01(OPENMP_FOUND LIBRAW_USE_OPENMP)
+MACRO_BOOL_TO_01(OpenMP_FOUND LIBRAW_USE_OPENMP)
 
 # Jasper library check
 
@@ -397,7 +395,7 @@ MESSAGE(STATUS "----------------------------------------------------------------
 MESSAGE(STATUS " Libraw ${RAW_LIB_VERSION_STRING} configuration            <http://www.libraw.org>")
 MESSAGE(STATUS "")
 
-IF(OPENMP_FOUND)
+IF(OpenMP_FOUND)
     MESSAGE(STATUS " Libraw will be compiled with OpenMP support .................. YES")
 ELSE()
     MESSAGE(STATUS " Libraw will be compiled with OpenMP support .................. NO")
@@ -507,7 +505,7 @@ IF(MINGW)
     TARGET_LINK_LIBRARIES(raw ws2_32)
 ENDIF()
 
-IF(OPENMP_FOUND)
+IF(OpenMP_FOUND)
     target_link_libraries(raw OpenMP::OpenMP_CXX)
 ENDIF()
 
@@ -571,7 +569,7 @@ IF(MINGW)
     TARGET_LINK_LIBRARIES(raw_r ws2_32)
 ENDIF()
 
-IF(OPENMP_FOUND)
+IF(OpenMP_FOUND)
     TARGET_LINK_LIBRARIES(raw_r OpenMP::OpenMP_CXX)
 ENDIF()
 
@@ -678,7 +676,7 @@ MACRO(LIBRAW_BUILD_SAMPLES)
 
     TARGET_LINK_LIBRARIES(${_target} PRIVATE ${_rawlib})
 
-    IF(OPENMP_FOUND)
+    IF(OpenMP_FOUND)
         target_link_libraries(${_target} PUBLIC OpenMP::OpenMP_CXX)
     ENDIF()
 
