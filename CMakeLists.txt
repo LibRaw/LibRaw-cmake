@@ -277,50 +277,50 @@ IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
 
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS} ${PTHREADS_DEFINITIONS})
 
-    SET(librawspeed_LIB_SRCS ${RAWSPEED_PATH}/libraw/ArwDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/BitPumpJPEG.cpp
-                             ${RAWSPEED_PATH}/libraw/BitPumpMSB.cpp
-                             ${RAWSPEED_PATH}/libraw/BitPumpMSB32.cpp
-                             ${RAWSPEED_PATH}/libraw/BitPumpPlain.cpp
-                             ${RAWSPEED_PATH}/libraw/BlackArea.cpp
-                             ${RAWSPEED_PATH}/libraw/ByteStream.cpp
-                             ${RAWSPEED_PATH}/libraw/ByteStreamSwap.cpp
-                             ${RAWSPEED_PATH}/libraw/Camera.cpp
-                             ${RAWSPEED_PATH}/libraw/CameraMetaData.cpp
-                             ${RAWSPEED_PATH}/libraw/CameraMetadataException.cpp
-                             ${RAWSPEED_PATH}/libraw/CameraSensorInfo.cpp
-                             ${RAWSPEED_PATH}/libraw/ColorFilterArray.cpp
-                             ${RAWSPEED_PATH}/libraw/Common.cpp
-                             ${RAWSPEED_PATH}/libraw/Cr2Decoder.cpp
-                             ${RAWSPEED_PATH}/libraw/DngDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/DngDecoderSlices.cpp
-                             ${RAWSPEED_PATH}/libraw/DngOpcodes.cpp
-                             ${RAWSPEED_PATH}/libraw/FileIOException.cpp
-                             ${RAWSPEED_PATH}/libraw/FileMap.cpp
-                             ${RAWSPEED_PATH}/libraw/IOException.cpp
-                             ${RAWSPEED_PATH}/libraw/LJpegDecompressor.cpp
-                             ${RAWSPEED_PATH}/libraw/LJpegPlain.cpp
-                             ${RAWSPEED_PATH}/libraw/NefDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/NikonDecompressor.cpp
-                             ${RAWSPEED_PATH}/libraw/OrfDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/PefDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/PentaxDecompressor.cpp
-                             ${RAWSPEED_PATH}/libraw/RawDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/RawDecoderException.cpp
-                             ${RAWSPEED_PATH}/libraw/RawImage.cpp
-                             ${RAWSPEED_PATH}/libraw/RawImageDataFloat.cpp
-                             ${RAWSPEED_PATH}/libraw/RawImageDataU16.cpp
-                             ${RAWSPEED_PATH}/libraw/RawParser.cpp
-                             ${RAWSPEED_PATH}/libraw/Rw2Decoder.cpp
-                             ${RAWSPEED_PATH}/libraw/SrwDecoder.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffEntry.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffEntryBE.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffIFD.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffIFDBE.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffParser.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffParserException.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffParserHeaderless.cpp
-                             ${RAWSPEED_PATH}/libraw/TiffParserOlympus.cpp
+    SET(librawspeed_LIB_SRCS ${RAWSPEED_PATH}/ArwDecoder.cpp
+                             ${RAWSPEED_PATH}/BitPumpJPEG.cpp
+                             ${RAWSPEED_PATH}/BitPumpMSB.cpp
+                             ${RAWSPEED_PATH}/BitPumpMSB32.cpp
+                             ${RAWSPEED_PATH}/BitPumpPlain.cpp
+                             ${RAWSPEED_PATH}/BlackArea.cpp
+                             ${RAWSPEED_PATH}/ByteStream.cpp
+                             ${RAWSPEED_PATH}/ByteStreamSwap.cpp
+                             ${RAWSPEED_PATH}/Camera.cpp
+                             ${RAWSPEED_PATH}/CameraMetaData.cpp
+                             ${RAWSPEED_PATH}/CameraMetadataException.cpp
+                             ${RAWSPEED_PATH}/CameraSensorInfo.cpp
+                             ${RAWSPEED_PATH}/ColorFilterArray.cpp
+                             ${RAWSPEED_PATH}/Common.cpp
+                             ${RAWSPEED_PATH}/Cr2Decoder.cpp
+                             ${RAWSPEED_PATH}/DngDecoder.cpp
+                             ${RAWSPEED_PATH}/DngDecoderSlices.cpp
+                             ${RAWSPEED_PATH}/DngOpcodes.cpp
+                             ${RAWSPEED_PATH}/FileIOException.cpp
+                             ${RAWSPEED_PATH}/FileMap.cpp
+                             ${RAWSPEED_PATH}/IOException.cpp
+                             ${RAWSPEED_PATH}/LJpegDecompressor.cpp
+                             ${RAWSPEED_PATH}/LJpegPlain.cpp
+                             ${RAWSPEED_PATH}/NefDecoder.cpp
+                             ${RAWSPEED_PATH}/NikonDecompressor.cpp
+                             ${RAWSPEED_PATH}/OrfDecoder.cpp
+                             ${RAWSPEED_PATH}/PefDecoder.cpp
+                             ${RAWSPEED_PATH}/PentaxDecompressor.cpp
+                             ${RAWSPEED_PATH}/RawDecoder.cpp
+                             ${RAWSPEED_PATH}/RawDecoderException.cpp
+                             ${RAWSPEED_PATH}/RawImage.cpp
+                             ${RAWSPEED_PATH}/RawImageDataFloat.cpp
+                             ${RAWSPEED_PATH}/RawImageDataU16.cpp
+                             ${RAWSPEED_PATH}/RawParser.cpp
+                             ${RAWSPEED_PATH}/Rw2Decoder.cpp
+                             ${RAWSPEED_PATH}/SrwDecoder.cpp
+                             ${RAWSPEED_PATH}/TiffEntry.cpp
+                             ${RAWSPEED_PATH}/TiffEntryBE.cpp
+                             ${RAWSPEED_PATH}/TiffIFD.cpp
+                             ${RAWSPEED_PATH}/TiffIFDBE.cpp
+                             ${RAWSPEED_PATH}/TiffParser.cpp
+                             ${RAWSPEED_PATH}/TiffParserException.cpp
+                             ${RAWSPEED_PATH}/TiffParserHeaderless.cpp
+                             ${RAWSPEED_PATH}/TiffParserOlympus.cpp
     )
 
 ENDIF()
@@ -385,7 +385,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CM
 SET(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/
-                    ${LIBRAW_PATH}/libraw
+                    ${LIBRAW_PATH}/
                    )
 
 # -- Log messages about configuration ------------------------------------------------------------------
@@ -496,8 +496,7 @@ add_library(libraw::libraw ALIAS raw)
 target_include_directories(raw
         PUBLIC
             $<INSTALL_INTERFACE:libraw>
-            $<BUILD_INTERFACE:${LIBRAW_PATH}>
-        PRIVATE libraw/internal)
+            $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
 
@@ -562,8 +561,7 @@ TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
 target_include_directories(raw_r
         PUBLIC
         $<INSTALL_INTERFACE:libraw>
-        $<BUILD_INTERFACE:${LIBRAW_PATH}>
-        PRIVATE libraw/internal)
+        $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 IF(MINGW)
     TARGET_LINK_LIBRARIES(raw_r ws2_32)
@@ -619,7 +617,7 @@ INSTALL(FILES       ${LIBRAW_PATH}/libraw/libraw.h
                     ${LIBRAW_PATH}/libraw/libraw_internal.h
                     ${LIBRAW_PATH}/libraw/libraw_types.h
                     ${LIBRAW_PATH}/libraw/libraw_version.h
-                    ${LIBRAW_PATH}/libraw_config.h
+                    ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h
         DESTINATION include/libraw
         COMPONENT   Devel
        )
