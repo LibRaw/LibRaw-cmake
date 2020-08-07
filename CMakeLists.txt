@@ -22,14 +22,23 @@
 #
 # ============================================================
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.3)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12..16)
 
-PROJECT(libraw)
+
+# Determine if libraw is built as a subproject (using add_subdirectory)
+# or if it is the master project.
+set(MASTER_PROJECT OFF)
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(MASTER_PROJECT ON)
+    message(STATUS "CMake version: ${CMAKE_VERSION}")
+endif ()
+
+set(LIBRAW_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Relative path to libraw directory (default=CMAKE_CURRENT_SOURCE_DIR)")
 
 # ==================================================================================================
 # Library version info extraction
 
-FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_version.h _libraw_version_content)
+FILE(READ ${LIBRAW_PATH}/libraw/libraw_version.h _libraw_version_content)
 
 # API version strings
 STRING(REGEX MATCH "#define LIBRAW_MAJOR_VERSION[ \t]*([0-9]*)\n" _version_major_match ${_libraw_version_content})
@@ -61,25 +70,29 @@ MESSAGE(STATUS "LibRaw string version: ${RAW_LIB_VERSION_STRING}")
 MESSAGE(STATUS "LibRaw ID version:     ${RAW_LIB_VERSION_ID}")
 MESSAGE(STATUS "LibRaw SO version:     ${RAW_LIB_SO_VERSION_STRING}")
 
+project(libraw VERSION ${RAW_LIB_VERSION_STRING} LANGUAGES CXX)
+
 # ==================================================================================================
 # Project Options
 OPTION(BUILD_SHARED_LIBS           "Build library as shared library                 (default=ON)"                 ON)
 OPTION(ENABLE_OPENMP               "Build library with OpenMP support               (default=ON)"                 ON)
 OPTION(ENABLE_LCMS                 "Build library with LCMS support                 (default=ON)"                 ON)
-OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"                 ON)
+OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"    ${MASTER_PROJECT})
 OPTION(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec support (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL2   "Build library with extra Demosaic pack GPL2     (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL3   "Build library with extra Demosaic pack GPL3     (default=OFF)"                OFF)
 OPTION(ENABLE_DCRAW_DEBUG          "Build library with debug message from dcraw     (default=OFF)"                OFF)
+option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets"        ${MASTER_PROJECT})
+option(LIBRAW_INSTALL              "Generate the install target."                                    ${MASTER_PROJECT})
 
 SET(DEMOSAIC_PACK_GPL2_RPATH "LibRaw-demosaic-pack-GPL2" CACHE STRING
-    "Relavive path to extra Demosaic pack GPL2 (default=LibRaw-demosaic-pack-GPL2)")
+    "Relative path to extra Demosaic pack GPL2 (default=LibRaw-demosaic-pack-GPL2)")
 
-SET(DEMOSAIC_PACK_GPL3_RPATH "LibRaw-demosaic-pack-GPL3" CACHE STRING 
-    "Relavive path to extra Demosaic pack GPL3 (default=LibRaw-demosaic-pack-GPL3)")
+SET(DEMOSAIC_PACK_GPL3_RPATH "LibRaw-demosaic-pack-GPL3" CACHE STRING
+    "Relative path to extra Demosaic pack GPL3 (default=LibRaw-demosaic-pack-GPL3)")
 
-SET(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING 
-    "Relavive path to extra RawSpeed codec     (default=RawSpeed)")
+SET(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING
+    "Relative path to extra RawSpeed codec     (default=RawSpeed)")
 
 SET(DEMOSAIC_PACK_GPL2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL2_RPATH}")
 SET(DEMOSAIC_PACK_GPL3_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL3_RPATH}")
@@ -116,7 +129,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 INCLUDE(MacroBoolTo01)
 INCLUDE(MacroLogFeature)
 INCLUDE(MacroOptionalFindPackage)
-INCLUDE(MacroJPEG)
 
 # Math library check
 
@@ -160,21 +172,20 @@ MACRO_BOOL_TO_01(LCMS_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_LCMS)
 # zlib library check
 
 FIND_PACKAGE(ZLIB)
+FIND_PACKAGE(JPEG)
 
 # Flag to use zlib with LibRaw DNG deflate codec
 IF(ZLIB_FOUND)
     ADD_DEFINITIONS(-DUSE_ZLIB)
-    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
 ENDIF()
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(ZLIB_FOUND LIBRAW_USE_DNGDEFLATECODEC)
 
 # JPEG library check
-
-DETECT_JPEG()
+find_package(JPEG)
 IF(JPEG_FOUND)
-    if (${JPEG_LIB_VERSION} LESS 80)
+    if (${JPEG_VERSION} LESS 80)
         set(JPEG8_FOUND FALSE)
     else()
         set(JPEG8_FOUND TRUE)
@@ -187,33 +198,17 @@ MACRO_LOG_FEATURE(JPEG8_FOUND "libjpeg" "JPEG image format support" "http://www.
 IF(JPEG8_FOUND)
     ADD_DEFINITIONS(-DUSE_JPEG)
     ADD_DEFINITIONS(-DUSE_JPEG8)
-    INCLUDE_DIRECTORIES(${JPEG_INCLUDE_DIR})
 ENDIF()
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(JPEG8_FOUND LIBRAW_USE_DNGLOSSYCODEC)
 
-# OpenMP library check
-
-SET(OPENMP_FOUND false)
-
 IF(ENABLE_OPENMP)
-    # OpenMP library detection (requires CMake >= 2.6.3)
-    MACRO_OPTIONAL_FIND_PACKAGE(OpenMP)
-
-    IF(OPENMP_FOUND)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        IF("${OpenMP_CXX_FLAGS}" STREQUAL "-fopenmp")
-            SET(OPENMP_LDFLAGS "-lgomp")
-        ENDIF()
-        IF("${OpenMP_CXX_FLAGS}" STREQUAL "-xopenmp")
-            SET(OPENMP_LDFLAGS "-xopenmp")
-        ENDIF()
-    ENDIF()
-ENDIF()
+    find_package(OpenMP REQUIRED)
+ENDIF(ENABLE_OPENMP)
 
 # For registration to libraw_config.h
-MACRO_BOOL_TO_01(OPENMP_FOUND LIBRAW_USE_OPENMP)
+MACRO_BOOL_TO_01(OpenMP_FOUND LIBRAW_USE_OPENMP)
 
 # Jasper library check
 
@@ -236,7 +231,7 @@ SET(RAWSPEED_SUPPORT_CAN_BE_COMPILED false)
 IF(ENABLE_RAWSPEED)
 
     FIND_PACKAGE(LibXml2)
-    FIND_PACKAGE(Pthreads)
+    FIND_PACKAGE(Threads REQUIRED)
 
     MESSAGE(STATUS "RawSpeed codec path: ${RAWSPEED_PATH}")
 
@@ -390,7 +385,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CM
 SET(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/
-                    ${CMAKE_CURRENT_SOURCE_DIR}/
+                    ${LIBRAW_PATH}/
                    )
 
 # -- Log messages about configuration ------------------------------------------------------------------
@@ -400,7 +395,7 @@ MESSAGE(STATUS "----------------------------------------------------------------
 MESSAGE(STATUS " Libraw ${RAW_LIB_VERSION_STRING} configuration            <http://www.libraw.org>")
 MESSAGE(STATUS "")
 
-IF(OPENMP_FOUND)
+IF(OpenMP_FOUND)
     MESSAGE(STATUS " Libraw will be compiled with OpenMP support .................. YES")
 ELSE()
     MESSAGE(STATUS " Libraw will be compiled with OpenMP support .................. NO")
@@ -460,17 +455,23 @@ ELSE()
     MESSAGE(STATUS " Libraw will be compiled with debug message from dcraw ........ NO")
 ENDIF()
 
+IF(BUILD_SHARED_LIBS)
+    MESSAGE(STATUS " Libraw will be compiled as a shared library")
+ELSE()
+    MESSAGE(STATUS " Libraw will be compiled as a static library")
+ENDIF()
+
 MESSAGE(STATUS "----------------------------------------------------------------------------------")
 MESSAGE(STATUS "")
 
-# -- Dedicated libraw target which not support multi-threading ---------------------------------------
+# -- Dedicated libraw target which does not support multi-threading ---------------------------------------
 
-SET(libraw_LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/internal/dcraw_common.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/internal/dcraw_fileio.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/internal/demosaic_packs.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/libraw_cxx.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/libraw_c_api.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/libraw_datastream.cpp
+SET(libraw_LIB_SRCS ${LIBRAW_PATH}/internal/dcraw_common.cpp
+                    ${LIBRAW_PATH}/internal/dcraw_fileio.cpp
+                    ${LIBRAW_PATH}/internal/demosaic_packs.cpp
+                    ${LIBRAW_PATH}/src/libraw_cxx.cpp
+                    ${LIBRAW_PATH}/src/libraw_c_api.cpp
+                    ${LIBRAW_PATH}/src/libraw_datastream.cpp
    )
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
@@ -489,7 +490,13 @@ FOREACH(_curentfile ${libraw_LIB_SRCS})
     ENDIF()
 ENDFOREACH(_curentfile ${libraw_LIB_SRCS})
 
-ADD_LIBRARY(raw ${libraw_LIB_SRCS})
+add_library(raw ${libraw_LIB_SRCS})
+add_library(libraw::libraw ALIAS raw)
+
+target_include_directories(raw
+        PUBLIC
+            $<INSTALL_INTERFACE:libraw>
+            $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
 
@@ -497,8 +504,8 @@ IF(MINGW)
     TARGET_LINK_LIBRARIES(raw ws2_32)
 ENDIF()
 
-IF(OPENMP_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${OPENMP_LDFLAGS})
+IF(OpenMP_FOUND)
+    target_link_libraries(raw OpenMP::OpenMP_CXX)
 ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
@@ -506,11 +513,11 @@ IF(LCMS_SUPPORT_CAN_BE_COMPILED)
 ENDIF()
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${ZLIB_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw ZLIB::ZLIB)
 ENDIF()
 
 IF(JPEG8_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${JPEG_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw JPEG::JPEG)
 ENDIF()
 
 IF(JASPER_FOUND)
@@ -529,24 +536,39 @@ SET_TARGET_PROPERTIES(raw PROPERTIES OUTPUT_NAME "raw")
 
 SET(libraw_r_LIB_SRCS ${libraw_LIB_SRCS})
 
-FOREACH(_curentfile ${libraw_r_LIB_SRCS})
-    IF(WIN32 AND MSVC)
-        SET_SOURCE_FILES_PROPERTIES(${_curentfile} PROPERTIES COMPILE_FLAGS "-w")
-    ELSE()
-        SET_SOURCE_FILES_PROPERTIES(${_curentfile} PROPERTIES COMPILE_FLAGS "-w -fPIC -O4")
-    ENDIF()
-ENDFOREACH(_curentfile ${libraw_r_LIB_SRCS})
-
 ADD_LIBRARY(raw_r ${libraw_r_LIB_SRCS})
+add_library(libraw::libraw_r ALIAS raw_r)
+
+IF(WIN32 AND MSVC)
+    set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w")
+    set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w")
+ELSE()
+    set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w -O4")
+    set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w -O4")
+
+    # Always build position-independent code (PIC), even when building Libraw as a
+    # static library so that shared libraries can link against it, not just
+    # executables (PIC does not apply on Windows).
+    if(NOT BUILD_SHARED_LIBS)
+        # Use set_target_properties() not append_target_property() here as
+        # POSITION_INDEPENDENT_CODE is a binary ON/OFF switch.
+        set_target_properties(raw PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    endif()
+ENDIF()
 
 TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
+target_include_directories(raw_r
+        PUBLIC
+        $<INSTALL_INTERFACE:libraw>
+        $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 IF(MINGW)
     TARGET_LINK_LIBRARIES(raw_r ws2_32)
 ENDIF()
 
-IF(OPENMP_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ${OPENMP_LDFLAGS})
+IF(OpenMP_FOUND)
+    TARGET_LINK_LIBRARIES(raw_r OpenMP::OpenMP_CXX)
 ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
@@ -554,11 +576,11 @@ IF(LCMS_SUPPORT_CAN_BE_COMPILED)
 ENDIF()
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ${ZLIB_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw_r ZLIB::ZLIB)
 ENDIF()
 
 IF(JPEG8_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ${JPEG_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw_r JPEG::JPEG)
 ENDIF()
 
 IF(JASPER_FOUND)
@@ -566,7 +588,7 @@ IF(JASPER_FOUND)
 ENDIF()
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
-    TARGET_LINK_LIBRARIES(raw_r ${LIBXML2_LIBRARIES} ${PTHREADS_LIBRARY})
+    TARGET_LINK_LIBRARIES(raw_r ${LIBXML2_LIBRARIES} Threads::Threads)
 ENDIF()
 
 SET_TARGET_PROPERTIES(raw_r PROPERTIES VERSION     ${RAW_LIB_SO_VERSION_STRING})
@@ -574,6 +596,7 @@ SET_TARGET_PROPERTIES(raw_r PROPERTIES SOVERSION   ${RAW_LIB_SO_CUR_VERSION})
 SET_TARGET_PROPERTIES(raw_r PROPERTIES OUTPUT_NAME "raw_r")
 
 # -- Files to install -------------------------------------------------------------------------------------
+if (LIBRAW_INSTALL)
 
 # Configure and install data file for packaging.
 IF(NOT WIN32)
@@ -587,13 +610,13 @@ IF(NOT WIN32)
 ENDIF()
 
 # Install Shared header files.
-INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_alloc.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_const.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_datastream.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_internal.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_types.h
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libraw/libraw_version.h
+INSTALL(FILES       ${LIBRAW_PATH}/libraw/libraw.h
+                    ${LIBRAW_PATH}/libraw/libraw_alloc.h
+                    ${LIBRAW_PATH}/libraw/libraw_const.h
+                    ${LIBRAW_PATH}/libraw/libraw_datastream.h
+                    ${LIBRAW_PATH}/libraw/libraw_internal.h
+                    ${LIBRAW_PATH}/libraw/libraw_types.h
+                    ${LIBRAW_PATH}/libraw/libraw_version.h
                     ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h
         DESTINATION include/libraw
         COMPONENT   Devel
@@ -618,18 +641,21 @@ INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
 
 # Install doc data files.
 IF(NOT WIN32)
-    INSTALL(FILES       ${CMAKE_CURRENT_SOURCE_DIR}/COPYRIGHT
-                        ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.CDDL
-                        ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.LGPL
-                        ${CMAKE_CURRENT_SOURCE_DIR}/Changelog.txt
+    INSTALL(FILES       ${LIBRAW_PATH}/COPYRIGHT
+                        ${LIBRAW_PATH}/LICENSE.CDDL
+                        ${LIBRAW_PATH}/LICENSE.LGPL
+                        ${LIBRAW_PATH}/Changelog.txt
             DESTINATION share/libraw
             COMPONENT main
            )
 ENDIF()
+endif(LIBRAW_INSTALL)
 
 # Uninstall rules
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/Uninstall.cmake ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake COPYONLY)
-ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake")
+IF(LIBRAW_UNINSTALL_TARGET)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/Uninstall.cmake ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake COPYONLY)
+    ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake")
+ENDIF(LIBRAW_UNINSTALL_TARGET)
 
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
 
@@ -641,19 +667,19 @@ MACRO(LIBRAW_BUILD_SAMPLES)
     STRING(REPLACE "." ";" _temp ${_filename})
     LIST(GET _temp 0 _target)
 
-    SET(${_target}_SRCS samples/${_filename})
+    SET(${_target}_SRCS ${LIBRAW_PATH}/samples/${_filename})
     SET_SOURCE_FILES_PROPERTIES(${${_target}_SRCS} PROPERTIES COMPILE_FLAGS -w)
 
     ADD_EXECUTABLE(${_target} ${${_target}_SRCS})
 
-    TARGET_LINK_LIBRARIES(${_target} ${_rawlib})
+    TARGET_LINK_LIBRARIES(${_target} PRIVATE ${_rawlib})
 
-    IF(OPENMP_FOUND)
-        TARGET_LINK_LIBRARIES(${_target} ${OPENMP_LDFLAGS})
+    IF(OpenMP_FOUND)
+        target_link_libraries(${_target} PUBLIC OpenMP::OpenMP_CXX)
     ENDIF()
 
     IF (${_rawlib} MATCHES "raw_r")
-        TARGET_LINK_LIBRARIES(${_target} ${PTHREADS_LIBRARY})
+        TARGET_LINK_LIBRARIES(${_target} PUBLIC ${PTHREADS_LIBRARY})
     ENDIF()
 
     IF(WIN32)
@@ -685,7 +711,7 @@ IF(ENABLE_EXAMPLES)
     LIBRAW_BUILD_SAMPLES(multirender_test.cpp raw)
     LIBRAW_BUILD_SAMPLES(postprocessing_benchmark.cpp raw)
 
-    IF (PTHREADS_FOUND)
+    IF (TARGET Threads::Threads)
         IF(WIN32)
             LIBRAW_BUILD_SAMPLES(half_mt_win32.c raw_r)
         ELSE()
