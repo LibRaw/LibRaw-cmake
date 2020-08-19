@@ -47,4 +47,10 @@ it under the terms of the one of two licenses as you choose:
 /* Define to 1 if LibRaw have been compiled with debug message from dcraw */
 #cmakedefine LIBRAW_USE_DCRAW_DEBUG 1
 
+/* Define to 1 if LibRaw have been compiled with Foveon X3F support */
+#cmakedefine LIBRAW_USE_X3FTOOLS 1
+
+/* Define to 1 if LibRaw have been compiled with Raspberry Pi RAW support */
+#cmakedefine LIBRAW_USE_6BY9RPI 1
+
 #endif

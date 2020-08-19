@@ -82,6 +82,8 @@ OPTION(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec supp
 OPTION(ENABLE_DEMOSAIC_PACK_GPL2   "Build library with extra Demosaic pack GPL2     (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL3   "Build library with extra Demosaic pack GPL3     (default=OFF)"                OFF)
 OPTION(ENABLE_DCRAW_DEBUG          "Build library with debug message from dcraw     (default=OFF)"                OFF)
+OPTION(ENABLE_X3FTOOLS             "Build library with Foveon X3F support           (default=OFF)"                OFF)
+OPTION(ENABLE_6BY9RPI              "Build library with Rapsberry Pi RAW support     (default=OFF)"                OFF)
 option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets"        ${MASTER_PROJECT})
 option(LIBRAW_INSTALL              "Generate the install target."                                    ${MASTER_PROJECT})
 
@@ -370,6 +372,22 @@ ENDIF()
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(ENABLE_DCRAW_DEBUG LIBRAW_USE_DCRAW_DEBUG)
+
+# Flag to add Foveon X3F support 
+IF(ENABLE_X3FTOOLS)
+    ADD_DEFINITIONS(-DUSE_X3FTOOLS)
+ENDIF()
+
+# For registration to libraw_config.h
+MACRO_BOOL_TO_01(ENABLE_X3FTOOLS LIBRAW_USE_X3FTOOLS)
+
+# Flag to add Raspberry Pi RAW support 
+IF(ENABLE_6BY9RPI)
+    ADD_DEFINITIONS(-DUSE_6BY9RPI)
+ENDIF()
+
+# For registration to libraw_config.h
+MACRO_BOOL_TO_01(ENABLE_6BY9RPI LIBRAW_USE_6BY9RPI)
 
 # Flag to export library symbols
 IF (WIN32)
