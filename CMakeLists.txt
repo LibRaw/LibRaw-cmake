@@ -473,6 +473,18 @@ ELSE()
     MESSAGE(STATUS " Libraw will be compiled with debug message from dcraw ........ NO")
 ENDIF()
 
+IF(ENABLE_X3FTOOLS)
+    MESSAGE(STATUS " Libraw will be compiled with Foveon X3F support .............. YES")
+ELSE()
+    MESSAGE(STATUS " Libraw will be compiled with Foveon X3F support .............. NO")
+ENDIF()
+
+IF(ENABLE_6BY9RPI)
+    MESSAGE(STATUS " Libraw will be compiled with Raspberry Pi RAW support ........ YES")
+ELSE()
+    MESSAGE(STATUS " Libraw will be compiled with Raspberry Pi RAW support ........ NO")
+ENDIF()
+
 IF(BUILD_SHARED_LIBS)
     MESSAGE(STATUS " Libraw will be compiled as a shared library")
 ELSE()
