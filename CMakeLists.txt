@@ -34,6 +34,11 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif ()
 
 set(LIBRAW_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Relative path to libraw directory (default=CMAKE_CURRENT_SOURCE_DIR)")
+if(NOT EXISTS "${LIBRAW_PATH}")
+    message(STATUS "LIBRAW_PATH=${LIBRAW_PATH}")
+    message(FATAL_ERROR "LIBRAW_PATH does not contain a valid path to the libraw home")
+endif()
+
 
 # ==================================================================================================
 # Library version info extraction
@@ -508,20 +513,18 @@ IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
     SET(libraw_LIB_SRCS ${libraw_LIB_SRCS} ${librawspeed_LIB_SRCS})
 ENDIF()
 
-# Disable compilation warnings from LibRaw. Just to be clear on the console.
-# Add flag to not support re-entrancy. Faster but cannot be used in multi-threading.
-# Adjust flag for static lib and 64 bits computers using -fPIC for GCC compiler
-# Use O4 GCC compilation option to prevent artifacts with OpenMP
-FOREACH(_curentfile ${libraw_LIB_SRCS})
-    IF(WIN32 AND MSVC)
-        SET_SOURCE_FILES_PROPERTIES(${_curentfile} PROPERTIES COMPILE_FLAGS "-w -DLIBRAW_NOTHREADS")
-    ELSE()
-        SET_SOURCE_FILES_PROPERTIES(${_curentfile} PROPERTIES COMPILE_FLAGS "-w -DLIBRAW_NOTHREADS -fPIC -O4 ")
-    ENDIF()
-ENDFOREACH(_curentfile ${libraw_LIB_SRCS})
 
 add_library(raw ${libraw_LIB_SRCS})
 add_library(libraw::libraw ALIAS raw)
+target_compile_definitions(raw PRIVATE LIBRAW_NOTHREADS)
+
+# Disable compilation warnings from LibRaw. Just to be clear on the console.
+# Use O4 GCC compilation option to prevent artifacts with OpenMP
+IF(WIN32 AND MSVC)
+    target_compile_options(raw PRIVATE -w)
+ELSE()
+    target_compile_options(raw PRIVATE -w -O4)
+ENDIF()
 
 target_include_directories(raw
         PUBLIC
@@ -570,22 +573,18 @@ ADD_LIBRARY(raw_r ${libraw_r_LIB_SRCS})
 add_library(libraw::libraw_r ALIAS raw_r)
 
 IF(WIN32 AND MSVC)
-    set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w")
-    set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w")
+    target_compile_options(raw_r PRIVATE -w)
 ELSE()
-    set_target_properties(raw PROPERTIES COMPILE_FLAGS "-w -O4")
-    set_target_properties(raw_r PROPERTIES COMPILE_FLAGS "-w -O4")
-
-    # Always build position-independent code (PIC), even when building Libraw as a
-    # static library so that shared libraries can link against it, not just
-    # executables (PIC does not apply on Windows).
-    if(NOT BUILD_SHARED_LIBS)
-        # Use set_target_properties() not append_target_property() here as
-        # POSITION_INDEPENDENT_CODE is a binary ON/OFF switch.
-        set_target_properties(raw PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    endif()
+    target_compile_options(raw_r PRIVATE -w -O4)
 ENDIF()
+
+# Always build position-independent code (PIC), even when building Libraw as a
+# static library so that shared libraries can link against it, not just
+# executables (PIC does not apply on Windows).
+# Use set_target_properties() not append_target_property() here as
+# POSITION_INDEPENDENT_CODE is a binary ON/OFF switch.
+set_target_properties(raw PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
 target_include_directories(raw_r
@@ -698,9 +697,9 @@ MACRO(LIBRAW_BUILD_SAMPLES)
     LIST(GET _temp 0 _target)
 
     SET(${_target}_SRCS ${LIBRAW_PATH}/samples/${_filename})
-    SET_SOURCE_FILES_PROPERTIES(${${_target}_SRCS} PROPERTIES COMPILE_FLAGS -w)
 
     ADD_EXECUTABLE(${_target} ${${_target}_SRCS})
+    target_compile_options(${_target} PRIVATE -w)
 
     TARGET_LINK_LIBRARIES(${_target} PRIVATE ${_rawlib})
 
