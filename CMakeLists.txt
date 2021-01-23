@@ -565,6 +565,7 @@ ENDIF()
 SET_TARGET_PROPERTIES(raw PROPERTIES VERSION     ${RAW_LIB_SO_VERSION_STRING})
 SET_TARGET_PROPERTIES(raw PROPERTIES SOVERSION   ${RAW_LIB_SO_CUR_VERSION})
 SET_TARGET_PROPERTIES(raw PROPERTIES OUTPUT_NAME "raw")
+SET_TARGET_PROPERTIES(raw PROPERTIES COMPILE_PDB_NAME "raw")
 
 # -- Dedicated libraw target to support multi-threading ---------------------------------------------
 
@@ -624,6 +625,7 @@ ENDIF()
 SET_TARGET_PROPERTIES(raw_r PROPERTIES VERSION     ${RAW_LIB_SO_VERSION_STRING})
 SET_TARGET_PROPERTIES(raw_r PROPERTIES SOVERSION   ${RAW_LIB_SO_CUR_VERSION})
 SET_TARGET_PROPERTIES(raw_r PROPERTIES OUTPUT_NAME "raw_r")
+SET_TARGET_PROPERTIES(raw_r PROPERTIES COMPILE_PDB_NAME "raw_r")
 
 # -- Files to install -------------------------------------------------------------------------------------
 if (LIBRAW_INSTALL)
@@ -664,6 +666,17 @@ INSTALL(TARGETS raw_r
         LIBRARY DESTINATION lib${LIB_SUFFIX}
         ARCHIVE DESTINATION lib${LIB_SUFFIX}
        )
+
+IF(MSVC)
+    INSTALL(FILES ${PROJECT_BINARY_DIR}/raw.pdb
+            DESTINATION lib
+            CONFIGURATIONS Debug RelWithDebInfo
+           )
+    INSTALL(FILES ${PROJECT_BINARY_DIR}/raw_r.pdb
+            DESTINATION lib
+            CONFIGURATIONS Debug RelWithDebInfo
+           )
+ENDIF()
 
 # Install find cmake script to the system for client applications.
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
