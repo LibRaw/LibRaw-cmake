@@ -83,6 +83,7 @@ project(libraw VERSION ${RAW_LIB_VERSION_STRING} LANGUAGES CXX)
 OPTION(BUILD_SHARED_LIBS           "Build library as shared library                 (default=ON)"                 ON)
 OPTION(ENABLE_OPENMP               "Build library with OpenMP support               (default=ON)"                 ON)
 OPTION(ENABLE_LCMS                 "Build library with LCMS support                 (default=ON)"                 ON)
+OPTION(ENABLE_JASPER               "Build library with libjasper support            (default=ON)"                 ON)
 OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"    ${MASTER_PROJECT})
 OPTION(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec support (default=OFF)"                OFF)
 OPTION(ENABLE_DEMOSAIC_PACK_GPL2   "Build library with extra Demosaic pack GPL2     (default=OFF)"                OFF)
@@ -219,13 +220,15 @@ ENDIF(ENABLE_OPENMP)
 MACRO_BOOL_TO_01(OpenMP_FOUND LIBRAW_USE_OPENMP)
 
 # Jasper library check
+SET(JASPER_FOUND false)
+IF(ENABLE_JASPER)
+    FIND_PACKAGE(Jasper)
 
-FIND_PACKAGE(Jasper)
-
-# Flag to use libjasper with LibRaw RedCine codec
-IF(JASPER_FOUND)
-    ADD_DEFINITIONS(-DUSE_JASPER)
-    INCLUDE_DIRECTORIES(${JASPER_INCLUDE_DIR})
+    # Flag to use libjasper with LibRaw RedCine codec
+    IF(JASPER_FOUND)
+        ADD_DEFINITIONS(-DUSE_JASPER)
+        INCLUDE_DIRECTORIES(${JASPER_INCLUDE_DIR})
+    ENDIF()
 ENDIF()
 
 # For registration to libraw_config.h
