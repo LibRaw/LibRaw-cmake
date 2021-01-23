@@ -39,6 +39,7 @@ if(NOT EXISTS "${LIBRAW_PATH}")
     message(FATAL_ERROR "LIBRAW_PATH does not contain a valid path to the libraw home")
 endif()
 
+file(TO_CMAKE_PATH "${LIBRAW_PATH}" LIBRAW_PATH)
 
 # ==================================================================================================
 # Library version info extraction
