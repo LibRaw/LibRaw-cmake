@@ -505,79 +505,11 @@ MESSAGE(STATUS "")
 
 # -- Dedicated libraw target which does not support multi-threading ---------------------------------------
 
-SET(libraw_LIB_SRCS
-    ${LIBRAW_PATH}/src/libraw_c_api.cpp
-    ${LIBRAW_PATH}/src/libraw_datastream.cpp
-    ${LIBRAW_PATH}/src/decoders/canon_600.cpp
-    ${LIBRAW_PATH}/src/decoders/crx.cpp
-    ${LIBRAW_PATH}/src/decoders/decoders_dcraw.cpp
-    ${LIBRAW_PATH}/src/decoders/decoders_libraw.cpp
-    ${LIBRAW_PATH}/src/decoders/decoders_libraw_dcrdefs.cpp
-    ${LIBRAW_PATH}/src/decoders/dng.cpp
-    ${LIBRAW_PATH}/src/decoders/fp_dng.cpp
-    ${LIBRAW_PATH}/src/decoders/fuji_compressed.cpp
-    ${LIBRAW_PATH}/src/decoders/generic.cpp
-    ${LIBRAW_PATH}/src/decoders/kodak_decoders.cpp
-    ${LIBRAW_PATH}/src/decoders/load_mfbacks.cpp
-    ${LIBRAW_PATH}/src/decoders/smal.cpp
-    ${LIBRAW_PATH}/src/decoders/unpack_thumb.cpp
-    ${LIBRAW_PATH}/src/decoders/unpack.cpp
-    ${LIBRAW_PATH}/src/demosaic/aahd_demosaic.cpp
-    ${LIBRAW_PATH}/src/demosaic/ahd_demosaic.cpp
-    ${LIBRAW_PATH}/src/demosaic/dcb_demosaic.cpp
-    ${LIBRAW_PATH}/src/demosaic/dht_demosaic.cpp
-    ${LIBRAW_PATH}/src/demosaic/misc_demosaic.cpp
-    ${LIBRAW_PATH}/src/demosaic/xtrans_demosaic.cpp
-    ${LIBRAW_PATH}/src/metadata/adobepano.cpp
-    ${LIBRAW_PATH}/src/metadata/canon.cpp
-    ${LIBRAW_PATH}/src/metadata/ciff.cpp
-    ${LIBRAW_PATH}/src/metadata/cr3_parser.cpp
-    ${LIBRAW_PATH}/src/metadata/identify.cpp
-    ${LIBRAW_PATH}/src/metadata/identify_tools.cpp
-    ${LIBRAW_PATH}/src/metadata/epson.cpp
-    ${LIBRAW_PATH}/src/metadata/exif_gps.cpp
-    ${LIBRAW_PATH}/src/metadata/fuji.cpp
-    ${LIBRAW_PATH}/src/metadata/hasselblad_model.cpp
-    ${LIBRAW_PATH}/src/metadata/kodak.cpp
-    ${LIBRAW_PATH}/src/metadata/leica.cpp
-    ${LIBRAW_PATH}/src/metadata/makernotes.cpp
-    ${LIBRAW_PATH}/src/metadata/mediumformat.cpp
-    ${LIBRAW_PATH}/src/metadata/minolta.cpp
-    ${LIBRAW_PATH}/src/metadata/misc_parsers.cpp
-    ${LIBRAW_PATH}/src/metadata/nikon.cpp
-    ${LIBRAW_PATH}/src/metadata/normalize_model.cpp
-    ${LIBRAW_PATH}/src/metadata/olympus.cpp
-    ${LIBRAW_PATH}/src/metadata/p1.cpp
-    ${LIBRAW_PATH}/src/metadata/pentax.cpp
-    ${LIBRAW_PATH}/src/metadata/samsung.cpp
-    ${LIBRAW_PATH}/src/metadata/sony.cpp
-    ${LIBRAW_PATH}/src/metadata/tiff.cpp
-    ${LIBRAW_PATH}/src/postprocessing/aspect_ratio.cpp
-    ${LIBRAW_PATH}/src/postprocessing/dcraw_process.cpp
-    ${LIBRAW_PATH}/src/preprocessing/ext_preprocess.cpp
-    ${LIBRAW_PATH}/src/postprocessing/mem_image.cpp
-    ${LIBRAW_PATH}/src/postprocessing/postprocessing_utils.cpp
-    ${LIBRAW_PATH}/src/postprocessing/postprocessing_utils_dcrdefs.cpp
-    ${LIBRAW_PATH}/src/postprocessing/postprocessing_aux.cpp
-    ${LIBRAW_PATH}/src/preprocessing/raw2image.cpp
-    ${LIBRAW_PATH}/src/preprocessing/subtract_black.cpp
-    ${LIBRAW_PATH}/src/tables/cameralist.cpp
-    ${LIBRAW_PATH}/src/tables/colorconst.cpp
-    ${LIBRAW_PATH}/src/tables/colordata.cpp
-    ${LIBRAW_PATH}/src/tables/wblists.cpp
-    ${LIBRAW_PATH}/src/write/apply_profile.cpp
-    ${LIBRAW_PATH}/src/utils/curves.cpp
-    ${LIBRAW_PATH}/src/utils/decoder_info.cpp
-    ${LIBRAW_PATH}/src/utils/init_close_utils.cpp
-    ${LIBRAW_PATH}/src/utils/open.cpp
-    ${LIBRAW_PATH}/src/utils/phaseone_processing.cpp
-    ${LIBRAW_PATH}/src/utils/utils_libraw.cpp
-    ${LIBRAW_PATH}/src/utils/utils_dcraw.cpp
-    ${LIBRAW_PATH}/src/utils/read_utils.cpp
-    ${LIBRAW_PATH}/src/utils/thumb_utils.cpp
-    ${LIBRAW_PATH}/src/write/file_write.cpp
-    ${LIBRAW_PATH}/src/write/tiff_writer.cpp
-)
+FILE(GLOB_RECURSE libraw_LIB_SRCS CONFIGURE_DEPENDS "${LIBRAW_PATH}/src/*.cpp")
+
+# Exclude placeholder (stub) implementations
+FILE(GLOB_RECURSE exclude_libraw_LIB_SRCS CONFIGURE_DEPENDS "${LIBRAW_PATH}/src/*_ph.cpp")
+LIST(REMOVE_ITEM libraw_LIB_SRCS ${exclude_libraw_LIB_SRCS})
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
     SET(libraw_LIB_SRCS ${libraw_LIB_SRCS} ${librawspeed_LIB_SRCS})
