@@ -505,11 +505,13 @@ MESSAGE(STATUS "")
 
 # -- Dedicated libraw target which does not support multi-threading ---------------------------------------
 
-FILE(GLOB_RECURSE libraw_LIB_SRCS CONFIGURE_DEPENDS "${LIBRAW_PATH}/src/*.cpp")
-
-# Exclude placeholder (stub) implementations
-FILE(GLOB_RECURSE exclude_libraw_LIB_SRCS CONFIGURE_DEPENDS "${LIBRAW_PATH}/src/*_ph.cpp")
-LIST(REMOVE_ITEM libraw_LIB_SRCS ${exclude_libraw_LIB_SRCS})
+SET(libraw_LIB_SRCS ${LIBRAW_PATH}/internal/dcraw_common.cpp
+                    ${LIBRAW_PATH}/internal/dcraw_fileio.cpp
+                    ${LIBRAW_PATH}/internal/demosaic_packs.cpp
+                    ${LIBRAW_PATH}/src/libraw_cxx.cpp
+                    ${LIBRAW_PATH}/src/libraw_c_api.cpp
+                    ${LIBRAW_PATH}/src/libraw_datastream.cpp
+   )
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
     SET(libraw_LIB_SRCS ${libraw_LIB_SRCS} ${librawspeed_LIB_SRCS})
@@ -727,7 +729,7 @@ MACRO(LIBRAW_BUILD_SAMPLES)
     ENDIF()
 
     IF(WIN32)
-        TARGET_LINK_LIBRARIES(${_target} ws2_32)
+        TARGET_LINK_LIBRARIES(${_target} PUBLIC ws2_32)
     ENDIF()
 
     INSTALL(TARGETS ${_target}
