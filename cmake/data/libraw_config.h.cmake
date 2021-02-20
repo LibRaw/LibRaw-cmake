@@ -38,12 +38,6 @@ it under the terms of the one of two licenses as you choose:
 /* Define to 1 if LibRaw have been compiled with RawSpeed codec support */
 #cmakedefine LIBRAW_USE_RAWSPEED 1
 
-/* Define to 1 if LibRaw have been compiled with Demosaic pack GPL2 support */
-#cmakedefine LIBRAW_USE_DEMOSAIC_PACK_GPL2 1
-
-/* Define to 1 if LibRaw have been compiled with Demosaic pack GPL3 support */
-#cmakedefine LIBRAW_USE_DEMOSAIC_PACK_GPL3 1
-
 /* Define to 1 if LibRaw have been compiled with debug message from dcraw */
 #cmakedefine LIBRAW_USE_DCRAW_DEBUG 1
 
