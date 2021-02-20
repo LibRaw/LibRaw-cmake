@@ -7,14 +7,9 @@ I. Installation steps
 
  $  tar xzvf LibRaw-0.xx.yy.tar.gz
 
-2. If you wish to use LibRaw demosaic pack(s), unpack them in the same folder:
+2. Copy this LibRaw-cmake scripts in LibRaw-... folder
 
- $  tar xzvf LibRaw-demosaic-pack-GPL2-0.xx.yy.tar.gz
- $  tar xzvf LibRaw-demosaic-pack-GPL3-0.xx.yy.tar.gz
-
-3. Copy this LibRaw-cmake scripts in LibRaw-... folder
-
-4. Go to LibRaw folder and run ./configure and make:
+3. Go to LibRaw folder and run ./configure and make:
 
  $ cd LibRaw-0.xx.yy
  $ ./cmake  [...optional args...] .
@@ -43,30 +38,6 @@ II. ./cmake options
 -DENABLE_EXAMPLES=ON/OFF
 
   Enables/disables examples compilation and installation. Enabled by default
-
-
--DENABLE_DEMOSAIC_PACK_GPL2=ON/OFF
--DDEMOSAIC_PACK_GPL2_RPATH=FOLDERNAME
--DCHECKOUT_DEMOSAIC_PACK_GPL2=ON/OFF
-
-  Enables/disables support of additional demosaic methods licensed under GPL2
-  You need to download and unpack LibRaw-demosaic-pack-GPL2 archive to use 
-  this feature.
-  ./cmake will try to find demosaic pack in:
-     
-     a) If folder is specified via  -DDDEMOSAIC_PACK_GPL2_RPATH=FOLDERNAME 
-        command-line option, then only this folder will be checked.
-        
-     b) If no folder is specified in -DDENABLE_DEMOSAIC_PACK_GPL2 switch:
-
-          ./LibRaw-demosaic-pack-GPL2 (in LibRaw folder)
-
-  If DCHECKOUT_DEMOSAIC_PACK_GPL2 is enabled, code wil be checkout from remote repository
-
--DENABLE_DEMOSAIC_PACK_GPL3=ON/OFF
--DDEMOSAIC_PACK_GPL3_RPATH=FOLDERNAME
--DCHECKOUT_DEMOSAIC_PACK_GPL3=ON/OFF
-        Same as above, but for GPL3-licensed demosaic pack.
 
 
 -DENABLE_RAWSPEED=ON/OFF

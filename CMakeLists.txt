@@ -86,25 +86,15 @@ OPTION(ENABLE_LCMS                 "Build library with LCMS support             
 OPTION(ENABLE_JASPER               "Build library with libjasper support            (default=ON)"                 ON)
 OPTION(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"    ${MASTER_PROJECT})
 OPTION(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec support (default=OFF)"                OFF)
-OPTION(ENABLE_DEMOSAIC_PACK_GPL2   "Build library with extra Demosaic pack GPL2     (default=OFF)"                OFF)
-OPTION(ENABLE_DEMOSAIC_PACK_GPL3   "Build library with extra Demosaic pack GPL3     (default=OFF)"                OFF)
 OPTION(ENABLE_DCRAW_DEBUG          "Build library with debug message from dcraw     (default=OFF)"                OFF)
 OPTION(ENABLE_X3FTOOLS             "Build library with Foveon X3F support           (default=OFF)"                OFF)
 OPTION(ENABLE_6BY9RPI              "Build library with Raspberry Pi RAW support     (default=OFF)"                OFF)
 option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets"        ${MASTER_PROJECT})
 option(LIBRAW_INSTALL              "Generate the install target."                                    ${MASTER_PROJECT})
 
-SET(DEMOSAIC_PACK_GPL2_RPATH "LibRaw-demosaic-pack-GPL2" CACHE STRING
-    "Relative path to extra Demosaic pack GPL2 (default=LibRaw-demosaic-pack-GPL2)")
-
-SET(DEMOSAIC_PACK_GPL3_RPATH "LibRaw-demosaic-pack-GPL3" CACHE STRING
-    "Relative path to extra Demosaic pack GPL3 (default=LibRaw-demosaic-pack-GPL3)")
-
 SET(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING
     "Relative path to extra RawSpeed codec     (default=RawSpeed)")
 
-SET(DEMOSAIC_PACK_GPL2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL2_RPATH}")
-SET(DEMOSAIC_PACK_GPL3_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DEMOSAIC_PACK_GPL3_RPATH}")
 SET(RAWSPEED_PATH           "${CMAKE_CURRENT_SOURCE_DIR}/${RAWSPEED_RPATH}")
 
 SET(INSTALL_CMAKE_MODULE_PATH  "share/libraw/cmake"  CACHE STRING
@@ -338,42 +328,6 @@ ENDIF()
 
 # -- Common LibRaw library compilation rules ------------------------------------------------------------------
 
-SET(DEMOSAIC_PACK_GPL2_SUPPORT_CAN_BE_COMPILED false)
-
-IF(ENABLE_DEMOSAIC_PACK_GPL2)
-    MESSAGE(STATUS "Demosaic pack GPL2 path: ${DEMOSAIC_PACK_GPL2_PATH}")
-
-    IF(EXISTS "${DEMOSAIC_PACK_GPL2_PATH}/dcraw_foveon.c")
-        INCLUDE_DIRECTORIES(${DEMOSAIC_PACK_GPL2_PATH})
-        # Flag to include demosaic pack GPL2
-        ADD_DEFINITIONS(-DLIBRAW_DEMOSAIC_PACK_GPL2)
-        SET(DEMOSAIC_PACK_GPL2_SUPPORT_CAN_BE_COMPILED true)
-    ELSE()
-        MESSAGE(STATUS "Demosaic pack GPL2 source code not found. Please checkout source code from Libraw project website.")
-    ENDIF()
-ENDIF()
-
-# For registration to libraw_config.h
-MACRO_BOOL_TO_01(DEMOSAIC_PACK_GPL2_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_DEMOSAIC_PACK_GPL2)
-
-SET(DEMOSAIC_PACK_GPL3_SUPPORT_CAN_BE_COMPILED false)
-
-IF(ENABLE_DEMOSAIC_PACK_GPL3)
-    MESSAGE(STATUS "Demosaic pack GPL3 path: ${DEMOSAIC_PACK_GPL3_PATH}")
-
-    IF(EXISTS "${DEMOSAIC_PACK_GPL3_PATH}/green_equi.c")
-        INCLUDE_DIRECTORIES(${DEMOSAIC_PACK_GPL3_PATH})
-        # Flag to include demosaic pack GPL3
-        ADD_DEFINITIONS(-DLIBRAW_DEMOSAIC_PACK_GPL3)
-        SET(DEMOSAIC_PACK_GPL3_SUPPORT_CAN_BE_COMPILED true)
-    ELSE()
-        MESSAGE(STATUS "Demosaic pack GPL3 source code not found. Please checkout source code from Libraw project website.")
-    ENDIF()
-ENDIF()
-
-# For registration to libraw_config.h
-MACRO_BOOL_TO_01(DEMOSAIC_PACK_GPL3_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_DEMOSAIC_PACK_GPL3)
-
 # Flag to add debug print on the console 
 IF(ENABLE_DCRAW_DEBUG)
     ADD_DEFINITIONS(-DDCRAW_VERBOSE)
@@ -456,18 +410,6 @@ IF(JPEG8_FOUND)
     MESSAGE(STATUS " Libraw will be compiled with DNG lossy codec support ......... YES")
 ELSE()
     MESSAGE(STATUS " Libraw will be compiled with DNG lossy codec support ......... NO")
-ENDIF()
-
-IF(DEMOSAIC_PACK_GPL2_SUPPORT_CAN_BE_COMPILED)
-    MESSAGE(STATUS " Libraw will be compiled with Demosaic Pack GPL2 support ...... YES")
-ELSE()
-    MESSAGE(STATUS " Libraw will be compiled with Demosaic Pack GPL2 support ...... NO")
-ENDIF()
-
-IF(DEMOSAIC_PACK_GPL3_SUPPORT_CAN_BE_COMPILED)
-    MESSAGE(STATUS " Libraw will be compiled with Demosaic Pack GPL3 support ...... YES")
-ELSE()
-    MESSAGE(STATUS " Libraw will be compiled with Demosaic Pack GPL3 support ...... NO")
 ENDIF()
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
