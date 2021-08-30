@@ -479,7 +479,7 @@ target_include_directories(raw
 
 TARGET_LINK_LIBRARIES(raw PUBLIC ${MATH_LIBRARY})
 
-IF(MINGW)
+IF(WIN32)
     TARGET_LINK_LIBRARIES(raw PUBLIC ws2_32)
 ENDIF()
 
@@ -543,7 +543,7 @@ target_include_directories(raw_r
         $<INSTALL_INTERFACE:libraw>
         $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
-IF(MINGW)
+IF(WIN32)
     TARGET_LINK_LIBRARIES(raw_r PUBLIC ws2_32)
 ENDIF()
 
