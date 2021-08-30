@@ -225,7 +225,6 @@ SET(RAWSPEED_FOUND false)
 SET(RAWSPEED_SUPPORT_CAN_BE_COMPILED false)
 
 IF(ENABLE_RAWSPEED)
-
     FIND_PACKAGE(LibXml2)
     FIND_PACKAGE(Threads REQUIRED)
 
@@ -263,7 +262,6 @@ MACRO_BOOL_TO_01(RAWSPEED_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_RAWSPEED)
 # -- Compilation rules for RawSpeed library -------------------------------------------------------------
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
-
     INCLUDE_DIRECTORIES(${RAWSPEED_PATH})
 
     INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR} ${PTHREADS_INCLUDE_DIR})
@@ -323,7 +321,7 @@ ENDIF()
 
 # -- Common LibRaw library compilation rules ------------------------------------------------------------------
 
-# Flag to add debug print on the console 
+# Flag to add debug print on the console
 IF(ENABLE_DCRAW_DEBUG)
     ADD_DEFINITIONS(-DDCRAW_VERBOSE)
 ENDIF()
@@ -331,7 +329,7 @@ ENDIF()
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(ENABLE_DCRAW_DEBUG LIBRAW_USE_DCRAW_DEBUG)
 
-# Flag to add Foveon X3F support 
+# Flag to add Foveon X3F support
 IF(ENABLE_X3FTOOLS)
     ADD_DEFINITIONS(-DUSE_X3FTOOLS)
 ENDIF()
@@ -339,7 +337,7 @@ ENDIF()
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(ENABLE_X3FTOOLS LIBRAW_USE_X3FTOOLS)
 
-# Flag to add Raspberry Pi RAW support 
+# Flag to add Raspberry Pi RAW support
 IF(ENABLE_6BY9RPI)
     ADD_DEFINITIONS(-DUSE_6BY9RPI)
 ENDIF()
@@ -577,82 +575,80 @@ SET_TARGET_PROPERTIES(raw_r PROPERTIES COMPILE_PDB_NAME "raw_r")
 
 # -- Files to install -------------------------------------------------------------------------------------
 if (LIBRAW_INSTALL)
+    # Configure and install data file for packaging.
+    IF(NOT WIN32)
+        CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc @ONLY)
+        INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc DESTINATION lib${LIB_SUFFIX}/pkgconfig)
 
-# Configure and install data file for packaging.
-IF(NOT WIN32)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc @ONLY)
-    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc DESTINATION lib${LIB_SUFFIX}/pkgconfig)
+        CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_r.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc @ONLY)
+        INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc DESTINATION lib${LIB_SUFFIX}/pkgconfig)
 
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_r.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc @ONLY)
-    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc DESTINATION lib${LIB_SUFFIX}/pkgconfig)
+        CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.lsm)
+    ENDIF()
 
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.lsm)
-ENDIF()
-
-# Install Shared header files.
-INSTALL(FILES       ${LIBRAW_PATH}/libraw/libraw.h
-                    ${LIBRAW_PATH}/libraw/libraw_alloc.h
-                    ${LIBRAW_PATH}/libraw/libraw_const.h
-                    ${LIBRAW_PATH}/libraw/libraw_datastream.h
-                    ${LIBRAW_PATH}/libraw/libraw_internal.h
-                    ${LIBRAW_PATH}/libraw/libraw_types.h
-                    ${LIBRAW_PATH}/libraw/libraw_version.h
-                    ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h
-        DESTINATION include/libraw
-        COMPONENT   Devel
-       )
-
-# Install Shared binary files.
-INSTALL(TARGETS raw
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib${LIB_SUFFIX}
-        ARCHIVE DESTINATION lib${LIB_SUFFIX}
-       )
-
-INSTALL(TARGETS raw_r
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib${LIB_SUFFIX}
-        ARCHIVE DESTINATION lib${LIB_SUFFIX}
-       )
-
-IF(MSVC)
-    INSTALL(FILES ${PROJECT_BINARY_DIR}/raw.pdb
-            DESTINATION lib
-            CONFIGURATIONS Debug RelWithDebInfo
+    # Install Shared header files.
+    INSTALL(FILES       ${LIBRAW_PATH}/libraw/libraw.h
+                        ${LIBRAW_PATH}/libraw/libraw_alloc.h
+                        ${LIBRAW_PATH}/libraw/libraw_const.h
+                        ${LIBRAW_PATH}/libraw/libraw_datastream.h
+                        ${LIBRAW_PATH}/libraw/libraw_internal.h
+                        ${LIBRAW_PATH}/libraw/libraw_types.h
+                        ${LIBRAW_PATH}/libraw/libraw_version.h
+                        ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h
+            DESTINATION include/libraw
+            COMPONENT   Devel
            )
-    INSTALL(FILES ${PROJECT_BINARY_DIR}/raw_r.pdb
-            DESTINATION lib
-            CONFIGURATIONS Debug RelWithDebInfo
-           )
-ENDIF()
 
-# Install find cmake script to the system for client applications.
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
-        DESTINATION ${INSTALL_CMAKE_MODULE_PATH})
-
-# Install doc data files.
-IF(NOT WIN32)
-    INSTALL(FILES       ${LIBRAW_PATH}/COPYRIGHT
-                        ${LIBRAW_PATH}/LICENSE.CDDL
-                        ${LIBRAW_PATH}/LICENSE.LGPL
-                        ${LIBRAW_PATH}/Changelog.txt
-            DESTINATION share/libraw
-            COMPONENT main
+    # Install Shared binary files.
+    INSTALL(TARGETS raw
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib${LIB_SUFFIX}
+            ARCHIVE DESTINATION lib${LIB_SUFFIX}
            )
-ENDIF()
+
+    INSTALL(TARGETS raw_r
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib${LIB_SUFFIX}
+            ARCHIVE DESTINATION lib${LIB_SUFFIX}
+           )
+
+    IF(MSVC)
+        INSTALL(FILES ${PROJECT_BINARY_DIR}/raw.pdb
+                DESTINATION lib
+                CONFIGURATIONS Debug RelWithDebInfo
+               )
+        INSTALL(FILES ${PROJECT_BINARY_DIR}/raw_r.pdb
+                DESTINATION lib
+                CONFIGURATIONS Debug RelWithDebInfo
+               )
+    ENDIF()
+
+    # Install find cmake script to the system for client applications.
+    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
+            DESTINATION ${INSTALL_CMAKE_MODULE_PATH})
+
+    # Install doc data files.
+    IF(NOT WIN32)
+        INSTALL(FILES       ${LIBRAW_PATH}/COPYRIGHT
+                            ${LIBRAW_PATH}/LICENSE.CDDL
+                            ${LIBRAW_PATH}/LICENSE.LGPL
+                            ${LIBRAW_PATH}/Changelog.txt
+                DESTINATION share/libraw
+                COMPONENT main
+               )
+    ENDIF()
+
+    # Uninstall rules
+    IF(LIBRAW_UNINSTALL_TARGET)
+        CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/Uninstall.cmake ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake COPYONLY)
+        ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake")
+    ENDIF(LIBRAW_UNINSTALL_TARGET)
 endif(LIBRAW_INSTALL)
-
-# Uninstall rules
-IF(LIBRAW_UNINSTALL_TARGET)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/Uninstall.cmake ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake COPYONLY)
-    ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake")
-ENDIF(LIBRAW_UNINSTALL_TARGET)
 
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
 
 # add a small macro so that this is a bit cleaner
 MACRO(LIBRAW_BUILD_SAMPLES)
-
     SET(_filename ${ARGV0})
     SET(_rawlib ${ARGV1})
     STRING(REPLACE "." ";" _temp ${_filename})
@@ -686,7 +682,6 @@ MACRO(LIBRAW_BUILD_SAMPLES)
 ENDMACRO(LIBRAW_BUILD_SAMPLES)
 
 IF(ENABLE_EXAMPLES)
-
     LIBRAW_BUILD_SAMPLES(simple_dcraw.cpp raw)
 
     if(EXISTS mem_image.cpp)
