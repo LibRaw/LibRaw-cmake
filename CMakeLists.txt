@@ -133,6 +133,8 @@ ENDIF()
 # LCMS version 1 and 2 library check
 
 SET(LCMS_SUPPORT_CAN_BE_COMPILED false)
+SET(LCMS2_FOUND false)
+SET(LCMS_FOUND false)
 
 IF (ENABLE_LCMS)
     MESSAGE(STATUS "Check for LCMS2 availability...")
@@ -615,26 +617,18 @@ if (LIBRAW_INSTALL)
            )
 
     # Install Shared binary files.
-    INSTALL(TARGETS raw
+    INSTALL(TARGETS raw raw_r
+            EXPORT ${PROJECT_NAME}Targets
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib${LIB_SUFFIX}
             ARCHIVE DESTINATION lib${LIB_SUFFIX}
            )
 
-    INSTALL(TARGETS raw_r
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib${LIB_SUFFIX}
-            ARCHIVE DESTINATION lib${LIB_SUFFIX}
-           )
 
     IF(NOT BUILD_SHARED_LIBS AND "${CMAKE_CXX_SIMULATE_ID}" STREQUAL "MSVC")
         MESSAGE("ClangCl does not support pdb generation with static libraries")
     ELSEIF(MSVC)
-        INSTALL(FILES ${PROJECT_BINARY_DIR}/raw.pdb
-                DESTINATION lib
-                CONFIGURATIONS Debug RelWithDebInfo
-               )
-        INSTALL(FILES ${PROJECT_BINARY_DIR}/raw_r.pdb
+        INSTALL(FILES ${PROJECT_BINARY_DIR}/raw.pdb ${PROJECT_BINARY_DIR}/raw_r.pdb
                 DESTINATION lib
                 CONFIGURATIONS Debug RelWithDebInfo
                )
@@ -660,6 +654,30 @@ if (LIBRAW_INSTALL)
         CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/Uninstall.cmake ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake COPYONLY)
         ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake")
     ENDIF(LIBRAW_UNINSTALL_TARGET)
+
+    # Export the package for use from the build tree
+    export(TARGETS raw raw_r
+        NAMESPACE libraw:: FILE cmake/${PROJECT_NAME}Targets.cmake)
+    export(PACKAGE ${PROJECT_NAME})
+
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file(
+        cmake/${PROJECT_NAME}ConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY AnyNewerVersion)
+
+    configure_package_config_file(
+        cmake/${PROJECT_NAME}Config.cmake.in
+        cmake/${PROJECT_NAME}Config.cmake
+        INSTALL_DESTINATION lib/cmake/)
+
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION lib/cmake/)
+
+    install(EXPORT ${PROJECT_NAME}Targets
+        NAMESPACE libraw:: DESTINATION lib/cmake/)
 endif(LIBRAW_INSTALL)
 
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
