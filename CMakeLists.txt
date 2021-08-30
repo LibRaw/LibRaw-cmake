@@ -116,11 +116,6 @@ IF(WIN32 AND MSVC)
     ADD_DEFINITIONS(-D_AFX_SECURE_NO_WARNINGS)
 ENDIF()
 
-# Under Windows, use specific flag to compile.
-IF(WIN32)
-    ADD_DEFINITIONS(-DDJGPP)
-ENDIF()
-
 # -- Check dependencies --------------------------------------------------------------------------------
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} )
