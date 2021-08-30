@@ -345,11 +345,6 @@ ENDIF()
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(ENABLE_6BY9RPI LIBRAW_USE_6BY9RPI)
 
-# Flag to export library symbols
-IF (WIN32)
-    ADD_DEFINITIONS(-DLIBRAW_BUILDLIB)
-ENDIF()
-
 # Create a config header for client application.
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw_config.h)
 
@@ -465,6 +460,16 @@ add_library(raw ${libraw_LIB_SRCS})
 add_library(libraw::libraw ALIAS raw)
 target_compile_definitions(raw PRIVATE LIBRAW_NOTHREADS)
 
+# Flag to export library symbols
+if (WIN32)
+    target_compile_definitions(raw PRIVATE LIBRAW_BUILDLIB)
+endif()
+
+# Static builds use LIBRAW_NODLL:
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(raw PUBLIC LIBRAW_NODLL)
+endif()
+
 # Disable compilation warnings from LibRaw. Just to be clear on the console.
 # Use O4 GCC compilation option to prevent artifacts with OpenMP
 IF(WIN32 AND MSVC)
@@ -478,34 +483,34 @@ target_include_directories(raw
             $<INSTALL_INTERFACE:libraw>
             $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
-TARGET_LINK_LIBRARIES(raw ${MATH_LIBRARY})
+TARGET_LINK_LIBRARIES(raw PUBLIC ${MATH_LIBRARY})
 
 IF(MINGW)
-    TARGET_LINK_LIBRARIES(raw ws2_32)
+    TARGET_LINK_LIBRARIES(raw PUBLIC ws2_32)
 ENDIF()
 
 IF(OpenMP_FOUND)
-    target_link_libraries(raw OpenMP::OpenMP_CXX)
+    target_link_libraries(raw PUBLIC OpenMP::OpenMP_CXX)
 ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
-    TARGET_LINK_LIBRARIES(raw ${LCMS2_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw PUBLIC ${LCMS2_LIBRARIES})
 ENDIF()
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(raw ZLIB::ZLIB)
+    TARGET_LINK_LIBRARIES(raw PUBLIC ZLIB::ZLIB)
 ENDIF()
 
 IF(JPEG8_FOUND)
-    TARGET_LINK_LIBRARIES(raw JPEG::JPEG)
+    TARGET_LINK_LIBRARIES(raw PUBLIC JPEG::JPEG)
 ENDIF()
 
 IF(JASPER_FOUND)
-    TARGET_LINK_LIBRARIES(raw ${JASPER_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw PUBLIC ${JASPER_LIBRARIES})
 ENDIF()
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
-    TARGET_LINK_LIBRARIES(raw ${LIBXML2_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw PUBLIC ${LIBXML2_LIBRARIES})
 ENDIF()
 
 SET_TARGET_PROPERTIES(raw PROPERTIES VERSION     ${RAW_LIB_SO_VERSION_STRING})
@@ -517,8 +522,18 @@ SET_TARGET_PROPERTIES(raw PROPERTIES COMPILE_PDB_NAME "raw")
 
 SET(libraw_r_LIB_SRCS ${libraw_LIB_SRCS})
 
-ADD_LIBRARY(raw_r ${libraw_r_LIB_SRCS})
+add_library(raw_r ${libraw_r_LIB_SRCS})
 add_library(libraw::libraw_r ALIAS raw_r)
+
+# Flag to export library symbols
+if (WIN32)
+    target_compile_definitions(raw_r PRIVATE LIBRAW_BUILDLIB)
+endif()
+
+# Static builds use LIBRAW_NODLL:
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(raw_r PUBLIC LIBRAW_NODLL)
+endif()
 
 IF(WIN32 AND MSVC)
     target_compile_options(raw_r PRIVATE -w)
@@ -534,38 +549,38 @@ ENDIF()
 set_target_properties(raw PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-TARGET_LINK_LIBRARIES(raw_r ${MATH_LIBRARY})
+TARGET_LINK_LIBRARIES(raw_r PUBLIC ${MATH_LIBRARY})
 target_include_directories(raw_r
         PUBLIC
         $<INSTALL_INTERFACE:libraw>
         $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 IF(MINGW)
-    TARGET_LINK_LIBRARIES(raw_r ws2_32)
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC ws2_32)
 ENDIF()
 
 IF(OpenMP_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r OpenMP::OpenMP_CXX)
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC OpenMP::OpenMP_CXX)
 ENDIF()
 
 IF(LCMS_SUPPORT_CAN_BE_COMPILED)
-    TARGET_LINK_LIBRARIES(raw_r ${LCMS2_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC ${LCMS2_LIBRARIES})
 ENDIF()
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ZLIB::ZLIB)
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC ZLIB::ZLIB)
 ENDIF()
 
 IF(JPEG8_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r JPEG::JPEG)
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC JPEG::JPEG)
 ENDIF()
 
 IF(JASPER_FOUND)
-    TARGET_LINK_LIBRARIES(raw_r ${JASPER_LIBRARIES})
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC ${JASPER_LIBRARIES})
 ENDIF()
 
 IF(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
-    TARGET_LINK_LIBRARIES(raw_r ${LIBXML2_LIBRARIES} Threads::Threads)
+    TARGET_LINK_LIBRARIES(raw_r PUBLIC ${LIBXML2_LIBRARIES} Threads::Threads)
 ENDIF()
 
 SET_TARGET_PROPERTIES(raw_r PROPERTIES VERSION     ${RAW_LIB_SO_VERSION_STRING})
@@ -661,16 +676,8 @@ MACRO(LIBRAW_BUILD_SAMPLES)
 
     TARGET_LINK_LIBRARIES(${_target} PRIVATE ${_rawlib})
 
-    IF(OpenMP_FOUND)
-        target_link_libraries(${_target} PUBLIC OpenMP::OpenMP_CXX)
-    ENDIF()
-
     IF (${_rawlib} MATCHES "raw_r")
         TARGET_LINK_LIBRARIES(${_target} PUBLIC ${PTHREADS_LIBRARY})
-    ENDIF()
-
-    IF(WIN32)
-        TARGET_LINK_LIBRARIES(${_target} PUBLIC ws2_32)
     ENDIF()
 
     INSTALL(TARGETS ${_target}
