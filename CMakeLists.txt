@@ -627,7 +627,9 @@ if (LIBRAW_INSTALL)
             ARCHIVE DESTINATION lib${LIB_SUFFIX}
            )
 
-    IF(MSVC)
+    IF(NOT BUILD_SHARED_LIBS AND "${CMAKE_CXX_SIMULATE_ID}" STREQUAL "MSVC")
+        MESSAGE("ClangCl does not support pdb generation with static libraries")
+    ELSEIF(MSVC)
         INSTALL(FILES ${PROJECT_BINARY_DIR}/raw.pdb
                 DESTINATION lib
                 CONFIGURATIONS Debug RelWithDebInfo
