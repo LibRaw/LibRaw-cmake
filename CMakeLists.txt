@@ -472,14 +472,6 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(raw PUBLIC LIBRAW_NODLL)
 endif()
 
-# Disable compilation warnings from LibRaw. Just to be clear on the console.
-# Use O4 GCC compilation option to prevent artifacts with OpenMP
-IF(WIN32 AND MSVC)
-    target_compile_options(raw PRIVATE -w)
-ELSE()
-    target_compile_options(raw PRIVATE -w -O4)
-ENDIF()
-
 target_include_directories(raw
         PUBLIC
             $<INSTALL_INTERFACE:libraw>
@@ -536,12 +528,6 @@ endif()
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(raw_r PUBLIC LIBRAW_NODLL)
 endif()
-
-IF(WIN32 AND MSVC)
-    target_compile_options(raw_r PRIVATE -w)
-ELSE()
-    target_compile_options(raw_r PRIVATE -w -O4)
-ENDIF()
 
 # Always build position-independent code (PIC), even when building Libraw as a
 # static library so that shared libraries can link against it, not just
