@@ -485,6 +485,9 @@ endif()
 
 if(OpenMP_FOUND)
     target_link_libraries(raw PUBLIC OpenMP::OpenMP_CXX)
+    if(MINGW)
+        target_compile_definitions(raw PRIVATE LIBRAW_FORCE_OPENMP)
+    endif()
 endif()
 
 if(LCMS_SUPPORT_CAN_BE_COMPILED)
@@ -549,6 +552,9 @@ endif()
 
 if(OpenMP_FOUND)
     target_link_libraries(raw_r PUBLIC OpenMP::OpenMP_CXX)
+    if(MINGW)
+        target_compile_definitions(raw_r PRIVATE LIBRAW_FORCE_OPENMP)
+    endif()
 endif()
 
 if(LCMS_SUPPORT_CAN_BE_COMPILED)
