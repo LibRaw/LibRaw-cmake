@@ -104,6 +104,14 @@ if(WIN32 AND NOT DEFINED CMAKE_DEBUG_POSTFIX)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
+if(APPLE)
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64")
+        set(CMAKE_OSX_ARCHITECTURES "arm64")
+    else()
+        set(CMAKE_OSX_ARCHITECTURES "x86_64")
+    endif()
+endif()
+
 # To prevent warnings from M$ compiler
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
