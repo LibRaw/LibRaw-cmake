@@ -111,6 +111,9 @@ if(MSVC)
     add_definitions(-D_AFX_SECURE_NO_WARNINGS)
 endif()
 
+# For variables in $<INSTALL_INTERFACE:...>
+include(GNUInstallDirs)
+
 # -- Check dependencies --------------------------------------------------------------------------------
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} )
@@ -475,7 +478,7 @@ endif()
 
 target_include_directories(raw
         PUBLIC
-            $<INSTALL_INTERFACE:libraw>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libraw>
             $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 target_link_libraries(raw PUBLIC ${MATH_LIBRARY})
@@ -544,7 +547,7 @@ set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(raw_r PUBLIC ${MATH_LIBRARY})
 target_include_directories(raw_r
         PUBLIC
-        $<INSTALL_INTERFACE:libraw>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libraw>
         $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 if(WIN32)
@@ -586,7 +589,6 @@ set_target_properties(raw_r PROPERTIES COMPILE_PDB_NAME "raw_r")
 # -- Files to install -------------------------------------------------------------------------------------
 if (LIBRAW_INSTALL)
     # Configure and install data file for packaging.
-    include(GNUInstallDirs)
 
     if(NOT MSVC)
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc @ONLY)
