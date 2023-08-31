@@ -253,7 +253,7 @@ endif()
 
 if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
     add_definitions(-DUSE_DNGSDK)
-    add_subdirectory("${DNG_CMAKE_PROJECT}")
+    add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
     
     add_dependencies(raw dng_sdk)
     target_link_libraries(raw dng_sdk)
