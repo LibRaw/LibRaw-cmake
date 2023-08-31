@@ -710,13 +710,26 @@ endif()
 # -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
 
 if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
-    add_definitions(-DUSE_DNGSDK)
+
+    # Enable use of the DNG SDK
+    #
+    add_definitions(-DUSE_DNGSDK) 
+
+    # Include the DNG SDK CMake project
+    #
     add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
 
+    # Copy across the target definitions from the DNG SDK
+    # to the raw target so the headers are interpreted the same
+    # way as when the DNG SDK was compiled.
+    #
+    get_target_property(dng_sdk_defs dng_sdk COMPILE_DEFINITIONS)
+    target_compile_definitions(raw PRIVATE ${dng_sdk_defs})
+
+    # Setup the linking of the DNG SDK to the raw target
+    #
     target_include_directories(raw PRIVATE "${DNG_SDK_PATH}/source")
-
     target_link_libraries(raw PRIVATE dng_sdk)
-
     add_dependencies(raw dng_sdk)
 endif()
 
