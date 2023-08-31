@@ -712,9 +712,11 @@ endif()
 if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
     add_definitions(-DUSE_DNGSDK)
     add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
+
+    target_include_directories(raw PRIVATE "${DNG_CMAKE_PROJECT}")
+    target_link_libraries(raw PRIVATE dng_sdk)
     
     add_dependencies(raw dng_sdk)
-    target_link_libraries(raw PUBLIC dng_sdk)
 endif()
 
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
