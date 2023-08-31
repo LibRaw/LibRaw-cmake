@@ -719,18 +719,32 @@ if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
     #
     add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
 
+    # # Configure DNG SDK Headers for Linux, we
+    # # specify these here as copying across
+    # #
+    # add_definitions(-DqLinux)
+    # add_definitions(-DUNIX_ENV=1)
+    # add_definitions(-DqDNGXMPFiles=0)
+
     # Copy across the target definitions from the DNG SDK
     # to the raw target so the headers are interpreted the same
     # way as when the DNG SDK was compiled.
     #
     get_target_property(dng_sdk_defs dng_sdk COMPILE_DEFINITIONS)
+
     target_compile_definitions(raw PRIVATE ${dng_sdk_defs})
+    target_compile_definitions(raw_r PRIVATE ${dng_sdk_defs})
 
     # Setup the linking of the DNG SDK to the raw target
     #
     target_include_directories(raw PRIVATE "${DNG_SDK_PATH}/source")
+    target_include_directories(raw_r PRIVATE "${DNG_SDK_PATH}/source")
+    
     target_link_libraries(raw PRIVATE dng_sdk)
+    target_link_libraries(raw_r PRIVATE dng_sdk)
+
     add_dependencies(raw dng_sdk)
+    add_dependencies(raw_r dng_sdk)
 endif()
 
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
