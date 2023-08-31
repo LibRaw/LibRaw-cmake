@@ -767,6 +767,11 @@ macro(LIBRAW_BUILD_SAMPLES)
         target_link_libraries(${_target} PUBLIC ${PTHREADS_LIBRARY})
     endif()
 
+    if(DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+        target_compile_definitions(${_target} PRIVATE ${dng_sdk_defs})
+        target_include_directories(${_target} PRIVATE "${DNG_SDK_PATH}/source")
+    endif()
+
     install(TARGETS ${_target}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
