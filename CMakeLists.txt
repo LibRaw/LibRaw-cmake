@@ -228,37 +228,6 @@ endif()
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(JASPER_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_REDCINECODEC)
 
-# For Adobe DNG SDK Support
-set(DNG_SDK_FOUND false)
-set(DNG_SDK_SUPPORT_CAN_BE_COMPILED false)
-set(DNG_CMAKE_PROJECT "${DNG_SDK_PATH}/projects/linux")
-
-if (ENABLE_DNG_SDK)
-
-    message(STATUS "DNG SDK path: ${DNG_SDK_PATH}")
-    message(STATUS "DNG CMAKE path: ${DNG_CMAKE_PROJECT}")
-
-    if(EXISTS "${DNG_CMAKE_PROJECT}")
-        set(DNG_SDK_FOUND true)
-    else()
-        message(STATUS "DNG SDK source code not found. Please download source code from Adobe website.")
-    endif()
-endif()
-
-if (DNG_SDK_FOUND)
-    set(DNG_SDK_SUPPORT_CAN_BE_COMPILED on)
-endif()
-
-# -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
-
-if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
-    add_definitions(-DUSE_DNGSDK)
-    add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
-    
-    add_dependencies(raw dng_sdk)
-    target_link_libraries(raw dng_sdk)
-endif()
-
 # For RawSpeed Codec Support
 
 set(RAWSPEED_FOUND false)
@@ -716,6 +685,37 @@ if (LIBRAW_INSTALL)
     install(EXPORT ${PROJECT_NAME}Targets
         NAMESPACE libraw:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
 endif(LIBRAW_INSTALL)
+
+# For Adobe DNG SDK Support
+set(DNG_SDK_FOUND false)
+set(DNG_SDK_SUPPORT_CAN_BE_COMPILED false)
+set(DNG_CMAKE_PROJECT "${DNG_SDK_PATH}/projects/linux")
+
+if (ENABLE_DNG_SDK)
+
+    message(STATUS "DNG SDK path: ${DNG_SDK_PATH}")
+    message(STATUS "DNG CMAKE path: ${DNG_CMAKE_PROJECT}")
+
+    if(EXISTS "${DNG_CMAKE_PROJECT}")
+        set(DNG_SDK_FOUND true)
+    else()
+        message(STATUS "DNG SDK source code not found. Please download source code from Adobe website.")
+    endif()
+endif()
+
+if (DNG_SDK_FOUND)
+    set(DNG_SDK_SUPPORT_CAN_BE_COMPILED on)
+endif()
+
+# -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
+
+if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+    add_definitions(-DUSE_DNGSDK)
+    add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
+    
+    add_dependencies(raw dng_sdk)
+    target_link_libraries(raw dng_sdk)
+endif()
 
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
 
