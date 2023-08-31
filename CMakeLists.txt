@@ -86,15 +86,18 @@ option(ENABLE_LCMS                 "Build library with LCMS support             
 option(ENABLE_JASPER               "Build library with libjasper support            (default=ON)"                 ON)
 option(ENABLE_EXAMPLES             "Build library with sample command-line programs (default=ON)"    ${MASTER_PROJECT})
 option(ENABLE_RAWSPEED             "Build library with extra RawSpeed codec support (default=OFF)"                OFF)
+option(ENABLE_DNG_SDK              "Build library with extra Adobe DNG SDK support  (default=OFF)"                 OFF)
 option(ENABLE_DCRAW_DEBUG          "Build library with debug message from dcraw     (default=OFF)"                OFF)
 option(ENABLE_X3FTOOLS             "Build library with Foveon X3F support           (default=OFF)"                OFF)
 option(ENABLE_6BY9RPI              "Build library with Raspberry Pi RAW support     (default=OFF)"                OFF)
 option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of installed targets"        ${MASTER_PROJECT})
 option(LIBRAW_INSTALL              "Generate the install target."                                    ${MASTER_PROJECT})
 
+option(DNG_SDK_RPATH               "Relative path to extra Adobe DNG SDK     (default=dng_sdk)"      "dng_sdk")
+option(DNG_SDK_PATH               "Absolute path to extra Adobe DNG SDK      (default=${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}"       "${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}")
+
 set(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING
     "Relative path to extra RawSpeed codec     (default=RawSpeed)")
-
 set(RAWSPEED_PATH           "${CMAKE_CURRENT_SOURCE_DIR}/${RAWSPEED_RPATH}")
 
 # ==================================================================================================
@@ -110,6 +113,9 @@ if(MSVC)
     add_definitions(-D_ATL_SECURE_NO_WARNINGS)
     add_definitions(-D_AFX_SECURE_NO_WARNINGS)
 endif()
+
+# For variables in $<INSTALL_INTERFACE:...>
+include(GNUInstallDirs)
 
 # -- Check dependencies --------------------------------------------------------------------------------
 
@@ -221,6 +227,37 @@ endif()
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(JASPER_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_REDCINECODEC)
+
+# For Adobe DNG SDK Support
+set(DNG_SDK_FOUND false)
+set(DNG_SDK_SUPPORT_CAN_BE_COMPILED false)
+set(DNG_CMAKE_PROJECT "${DNG_SDK_PATH}/projects/linux")
+
+if (ENABLE_DNG_SDK)
+
+    message(STATUS "DNG SDK path: ${DNG_SDK_PATH}")
+    message(STATUS "DNG CMAKE path: ${DNG_CMAKE_PROJECT}")
+
+    if(EXISTS "${DNG_CMAKE_PROJECT}")
+        set(DNG_SDK_FOUND true)
+    else()
+        message(STATUS "DNG SDK source code not found. Please download source code from Adobe website.")
+    endif()
+endif()
+
+if (DNG_SDK_FOUND)
+    set(DNG_SDK_SUPPORT_CAN_BE_COMPILED on)
+endif()
+
+# -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
+
+if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+    add_definitions(-DUSE_DNGSDK)
+    add_subdirectory("${DNG_CMAKE_PROJECT}")
+    
+    add_dependencies(raw dng_sdk)
+    target_link_libraries(raw dng_sdk)
+endif()
 
 # For RawSpeed Codec Support
 
@@ -403,6 +440,12 @@ else()
     message(STATUS " Libraw will be compiled with DNG lossy codec support ......... NO")
 endif()
 
+if(DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+    message(STATUS " Libraw will be compiled with DNG SDK support ................ YES")
+else()
+    message(STATUS " Libraw will be compiled with DNG SDK support ................ NO")
+endif()
+
 if(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
     message(STATUS " Libraw will be compiled with RawSpeed support ................ YES")
 else()
@@ -475,7 +518,7 @@ endif()
 
 target_include_directories(raw
         PUBLIC
-            $<INSTALL_INTERFACE:libraw>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libraw>
             $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 target_link_libraries(raw PUBLIC ${MATH_LIBRARY})
@@ -544,7 +587,7 @@ set_target_properties(raw_r PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(raw_r PUBLIC ${MATH_LIBRARY})
 target_include_directories(raw_r
         PUBLIC
-        $<INSTALL_INTERFACE:libraw>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libraw>
         $<BUILD_INTERFACE:${LIBRAW_PATH}>)
 
 if(WIN32)
@@ -586,7 +629,6 @@ set_target_properties(raw_r PROPERTIES COMPILE_PDB_NAME "raw_r")
 # -- Files to install -------------------------------------------------------------------------------------
 if (LIBRAW_INSTALL)
     # Configure and install data file for packaging.
-    include(GNUInstallDirs)
 
     if(NOT MSVC)
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc @ONLY)
