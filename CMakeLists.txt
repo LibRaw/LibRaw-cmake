@@ -709,6 +709,9 @@ endif()
 
 # -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
 
+# For registration to libraw_config.h
+MACRO_BOOL_TO_01(DNG_SDK_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_DNG_SDK)
+
 if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
 
     # Enable use of the DNG SDK
