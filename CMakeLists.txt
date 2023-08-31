@@ -719,13 +719,6 @@ if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
     #
     add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
 
-    # # Configure DNG SDK Headers for Linux, we
-    # # specify these here as copying across
-    # #
-    # add_definitions(-DqLinux)
-    # add_definitions(-DUNIX_ENV=1)
-    # add_definitions(-DqDNGXMPFiles=0)
-
     # Copy across the target definitions from the DNG SDK
     # to the raw target so the headers are interpreted the same
     # way as when the DNG SDK was compiled.
