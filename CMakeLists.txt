@@ -619,7 +619,7 @@ if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
     target_link_libraries(
         raw
         PUBLIC
-        #     zlib
+
         ${XMP_LIB_DIR}/staticXMPCore.ar
         ${XMP_LIB_DIR}/staticXMPFiles.ar
 
