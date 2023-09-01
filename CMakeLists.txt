@@ -94,7 +94,10 @@ option(LIBRAW_UNINSTALL_TARGET     "Add a custom target to ease removal of insta
 option(LIBRAW_INSTALL              "Generate the install target."                                    ${MASTER_PROJECT})
 
 option(DNG_SDK_RPATH               "Relative path to extra Adobe DNG SDK     (default=dng_sdk)"      "dng_sdk")
-option(DNG_SDK_PATH               "Absolute path to extra Adobe DNG SDK      (default=${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}"       "${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}")
+option(DNG_SDK_PATH                "Absolute path to extra Adobe DNG SDK     (default=${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}"       "${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}")
+option(XMP_SDK_RPATH               "Relative path to extra Adobe XMP SDK     (default=xmp_toolkit)"      "xmp_toolkit")
+option(XMP_SDK_PATH                "Absolute path to extra Adobe XMP SDK     (default=${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}"       "${CMAKE_CURRENT_SOURCE_DIR}/${DNG_SDK_RPATH}")
+
 
 set(RAWSPEED_RPATH           "RawSpeed"           CACHE STRING
     "Relative path to extra RawSpeed codec     (default=RawSpeed)")
@@ -230,27 +233,92 @@ MACRO_BOOL_TO_01(JASPER_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_REDCINECODEC)
 
 # For Adobe DNG SDK Support
 set(DNG_SDK_FOUND false)
+set(XMP_SDK_FOUND false)
 set(DNG_SDK_SUPPORT_CAN_BE_COMPILED false)
-set(DNG_CMAKE_PROJECT "${DNG_SDK_PATH}/projects/linux")
+set(XMP_CMAKE_PROJECT "${XMP_SDK_PATH}/build")
 
 if (ENABLE_DNG_SDK)
 
-    message(STATUS "DNG SDK path: ${DNG_SDK_PATH}")
-    message(STATUS "DNG CMAKE path: ${DNG_CMAKE_PROJECT}")
+    if(ZLIB_FOUND)
 
-    if(EXISTS "${DNG_CMAKE_PROJECT}")
-        set(DNG_SDK_FOUND true)
+        if(EXISTS "${DNG_SDK_PATH}/source")
+            set(DNG_SDK_FOUND true)
+        else()
+            message(STATUS "DNG SDK source code not found. Please download source code from Adobe website and set DNG_SDK_PATH")
+        endif()
+
+        if(EXISTS "${XMP_CMAKE_PROJECT}")
+            set(XMP_SDK_FOUND true)
+        else()
+            message(STATUS "XMP SDK source code not found. Please download source code from https://github.com/adobe/XMP-Toolkit-SDK and set XMP_ROOT")
+        endif()
+
     else()
-        message(STATUS "DNG SDK source code not found. Please download source code from Adobe website.")
+        message(STATUS "LibZ dependency not resolved. LibRaw cannot be compiled with DNG SDK")
     endif()
-endif()
 
-if (DNG_SDK_FOUND)
-    set(DNG_SDK_SUPPORT_CAN_BE_COMPILED on)
+    if (DNG_SDK_FOUND AND XMP_SDK_FOUND)
+        set(DNG_SDK_SUPPORT_CAN_BE_COMPILED on)
+    endif()
 endif()
 
 # For registration to libraw_config.h
 MACRO_BOOL_TO_01(DNG_SDK_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_DNG_SDK)
+
+# -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
+
+if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+
+    include_directories(${DNG_SDK_PATH}/source/)
+    include_directories(${XMP_SDK_PATH}/public/include/)
+
+    # Enable use of the DNG SDK in libraw
+    #
+    add_definitions(-DUSE_DNGSDK)
+
+    # Compile Adobe's libraries with internal symbols enabled which the DNG
+    # SDK uses.
+    #
+    add_definitions(-DAdobePrivate=1)
+
+    # Adobe's SDKs need information about the platform they are being compiled
+    # for.
+    #
+    add_definitions(-DqLinux)
+    add_definitions(-DUNIX_ENV=1)
+
+    # Disable XMPFiles support in the DNG SDK as we don't need it in order to
+    # use the DNG SDK with libraw.
+    #
+    add_definitions(-DqDNGXMPFiles=0)
+
+    # Disable XMP Document Operation support in the DNG SDK as we don't need it in order to
+    # use the DNG SDK with libraw.
+    #
+    add_definitions(-DqDNGXMPDocOps=0)
+
+    # We need a reference to where the libries are located as the XMP toolkit
+    # outputs .ar files and we need to link to them when building the DNG SDK
+    # since cmake defaults to trying to link to the .a files.
+    #
+    set(XMP_LIB_DIR ${XMP_SDK_PATH}/public/libraries/i80386linux/release/)
+    message("XMP_LIB_DIR: ${XMP_LIB_DIR}")
+
+    # We need to build the XMP Toolkit statically as the DNG SDK requires methods
+    # from the library which are only built for the static version of the library. 
+    #
+    set(XMP_BUILD_STATIC On)
+    message("XMP_BUILD_STATIC: ${XMP_BUILD_STATIC}")
+
+    # Note: The XMP bundled with the DNG SDK doesn't compile for Linux due to some missing
+    # build files - so we build it directly
+    #
+    add_subdirectory(${XMP_CMAKE_PROJECT} build/xmp)
+
+    # Grab the DNG SDK headers
+    file(GLOB dng_LIB_SRCS ${DNG_SDK_PATH}/source/*.cpp)
+    file(GLOB dng_LIB_HEADERS ${DNG_SDK_PATH}/source/*.h)
+endif()
 
 # For RawSpeed Codec Support
 
@@ -490,6 +558,10 @@ else()
     list(REMOVE_ITEM libraw_LIB_SRCS ${exclude_libraw_LIB_SRCS})
 endif()
 
+if(DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+    set(libraw_LIB_SRCS ${libraw_LIB_SRCS} ${dng_LIB_SRCS})
+endif()
+
 if(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
     set(libraw_LIB_SRCS ${libraw_LIB_SRCS} ${librawspeed_LIB_SRCS})
 endif()
@@ -541,6 +613,25 @@ endif()
 
 if(JASPER_SUPPORT_CAN_BE_COMPILED)
     target_link_libraries(raw PUBLIC ${JASPER_LIBRARIES})
+endif()
+
+if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+    target_link_libraries(
+        raw
+        PUBLIC
+        #     zlib
+        ${XMP_LIB_DIR}/staticXMPCore.ar
+        ${XMP_LIB_DIR}/staticXMPFiles.ar
+
+        # If we just try to link the static libraries generated by XMP we get a bunch of
+        # duplicate symbol errors as for some reason we currently have an issue where some
+        # of the symbols from the core library end up in the XMPFiles library but we still
+        # need to import both. So we have to tell the linker we don't care for these particular
+        # libraries and to just link them anyway.
+        #
+        "-Wl,--whole-archive"
+        "-Wl,--no-whole-archive"
+    )
 endif()
 
 if(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
@@ -610,6 +701,25 @@ if(JASPER_SUPPORT_CAN_BE_COMPILED)
     target_link_libraries(raw_r PUBLIC ${JASPER_LIBRARIES})
 endif()
 
+if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+    
+    target_link_libraries(
+        raw_r
+        PUBLIC
+        ${XMP_LIB_DIR}/staticXMPCore.ar
+        ${XMP_LIB_DIR}/staticXMPFiles.ar
+
+        # If we just try to link the static libraries generated by XMP we get a bunch of
+        # duplicate symbol errors as for some reason we currently have an issue where some
+        # of the symbols from the core library end up in the XMPFiles library but we still
+        # need to import both. So we have to tell the linker we don't care for these particular
+        # libraries and to just link them anyway.
+        #
+        "-Wl,--whole-archive"
+        "-Wl,--no-whole-archive"
+    )
+endif()
+
 if(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
     target_link_libraries(raw_r PUBLIC ${LIBXML2_LIBRARIES} Threads::Threads)
 endif()
@@ -668,6 +778,17 @@ if (LIBRAW_INSTALL)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindLibRaw.cmake
             DESTINATION ${CMAKE_INSTALL_DATADIR}/cmake/libraw)
 
+    # Install DNG SDK's host header as downstream clients may need it
+    # in order to configure libraw for DNG SDK
+    #
+    if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
+        # Install DNG SDK files.
+        install(FILES   ${dng_LIB_HEADERS}
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libraw
+            COMPONENT   Devel
+        )
+    endif()
+
     # Install doc data files.
     if(NOT MSVC)
         install(FILES       ${LIBRAW_PATH}/COPYRIGHT
@@ -710,39 +831,6 @@ if (LIBRAW_INSTALL)
         NAMESPACE libraw:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
 endif(LIBRAW_INSTALL)
 
-# -- Compilation rules for Adobe DNG SDK -------------------------------------------------------------
-
-if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
-
-    # Enable use of the DNG SDK
-    #
-    add_definitions(-DUSE_DNGSDK) 
-
-    # Include the DNG SDK CMake project
-    #
-    add_subdirectory("${DNG_CMAKE_PROJECT}" build/libraw)
-
-    # Copy across the target definitions from the DNG SDK
-    # to the raw target so the headers are interpreted the same
-    # way as when the DNG SDK was compiled.
-    #
-    get_target_property(dng_sdk_defs dng_sdk COMPILE_DEFINITIONS)
-
-    target_compile_definitions(raw PRIVATE ${dng_sdk_defs})
-    target_compile_definitions(raw_r PRIVATE ${dng_sdk_defs})
-
-    # Setup the linking of the DNG SDK to the raw target
-    #
-    target_include_directories(raw PRIVATE "${DNG_SDK_PATH}/source")
-    target_include_directories(raw_r PRIVATE "${DNG_SDK_PATH}/source")
-    
-    target_link_libraries(raw PRIVATE dng_sdk)
-    target_link_libraries(raw_r PRIVATE dng_sdk)
-
-    add_dependencies(raw dng_sdk)
-    add_dependencies(raw_r dng_sdk)
-endif()
-
 # -- Compile LibRaw Examples --------------------------------------------------------------------------------
 
 # add a small macro so that this is a bit cleaner
@@ -761,11 +849,6 @@ macro(LIBRAW_BUILD_SAMPLES)
 
     if(${_rawlib} MATCHES "raw_r")
         target_link_libraries(${_target} PUBLIC ${PTHREADS_LIBRARY})
-    endif()
-
-    if(DNG_SDK_SUPPORT_CAN_BE_COMPILED)
-        target_compile_definitions(${_target} PRIVATE ${dng_sdk_defs})
-        target_include_directories(${_target} PRIVATE "${DNG_SDK_PATH}/source")
     endif()
 
     install(TARGETS ${_target}
