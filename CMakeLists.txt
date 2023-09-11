@@ -718,6 +718,9 @@ if (DNG_SDK_SUPPORT_CAN_BE_COMPILED)
         "-Wl,--whole-archive"
         "-Wl,--no-whole-archive"
     )
+
+    add_dependencies(raw XMPCoreStatic XMPFilesStatic)
+    add_dependencies(raw_r XMPCoreStatic XMPFilesStatic)
 endif()
 
 if(RAWSPEED_SUPPORT_CAN_BE_COMPILED)
