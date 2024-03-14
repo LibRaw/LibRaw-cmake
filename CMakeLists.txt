@@ -124,7 +124,7 @@ include(MacroOptionalFindPackage)
 
 # Math library check
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT EMSCRIPTEN)
     FIND_LIBRARY(MATH_LIBRARY m)
 endif()
 
