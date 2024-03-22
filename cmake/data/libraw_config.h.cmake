@@ -35,6 +35,9 @@ it under the terms of the one of two licenses as you choose:
 /* Define to 1 if LibRaw have been compiled with RedCine codec support */
 #cmakedefine LIBRAW_USE_REDCINECODEC 1
 
+/* Define to 1 if LibRaw have been compiled with Adobe DNG SDK support */
+#cmakedefine LIBRAW_USE_DNG_SDK 1
+
 /* Define to 1 if LibRaw have been compiled with RawSpeed codec support */
 #cmakedefine LIBRAW_USE_RAWSPEED 1
 
