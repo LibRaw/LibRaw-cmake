@@ -589,16 +589,11 @@ set_target_properties(raw_r PROPERTIES COMPILE_PDB_NAME "raw_r")
 # -- Files to install -------------------------------------------------------------------------------------
 if (LIBRAW_INSTALL)
     # Configure and install data file for packaging.
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-    if(NOT MSVC)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc @ONLY)
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_r.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc @ONLY)
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw.lsm)
-    endif()
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/data/libraw_r.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libraw_r.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
     # Install Shared header files.
     install(FILES       ${LIBRAW_PATH}/libraw/libraw.h
