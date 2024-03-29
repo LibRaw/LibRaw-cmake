@@ -122,10 +122,16 @@ include(MacroBoolTo01)
 include(MacroLogFeature)
 include(MacroOptionalFindPackage)
 
+set(LIBRAW_PC_LIBS_PRIVATE "")
+set(LIBRAW_PC_REQUIRES_PRIVATE "")
+
 # Math library check
 
 if(NOT WIN32 AND NOT EMSCRIPTEN)
     FIND_LIBRARY(MATH_LIBRARY m)
+    if(MATH_LIBRARY)
+        string(APPEND LIBRAW_PC_LIBS_PRIVATE " -l${MATH_LIBRARY}")
+    endif()
 endif()
 
 # LCMS version 1 and 2 library check
@@ -144,6 +150,7 @@ if(ENABLE_LCMS)
         # Flag to compile Little CMS version 2 with LibRaw
         add_definitions(-DUSE_LCMS2)
         set(LCMS_SUPPORT_CAN_BE_COMPILED true)
+        string(APPEND LIBRAW_PC_REQUIRES_PRIVATE " lcms2")
     else()
         message(STATUS "Check for LCMS availability instead LCMS2...")
         find_package(LCMS)
@@ -156,6 +163,7 @@ if(ENABLE_LCMS)
             # For compatibility
             set(LCMS2_LIBRARIES ${LCMS_LIBRARIES})
             set(LCMS_SUPPORT_CAN_BE_COMPILED true)
+            string(APPEND LIBRAW_PC_REQUIRES_PRIVATE " lcms")
         endif()
     endif()
 endif()
@@ -171,6 +179,7 @@ find_package(JPEG)
 # Flag to use zlib with LibRaw DNG deflate codec
 if(ZLIB_FOUND)
     add_definitions(-DUSE_ZLIB)
+    string(APPEND LIBRAW_PC_REQUIRES_PRIVATE " zlib")
 endif()
 
 # For registration to libraw_config.h
@@ -192,6 +201,7 @@ MACRO_LOG_FEATURE(JPEG8_FOUND "libjpeg" "JPEG image format support" "http://www.
 if(JPEG8_FOUND)
     add_definitions(-DUSE_JPEG)
     add_definitions(-DUSE_JPEG8)
+    string(APPEND LIBRAW_PC_REQUIRES_PRIVATE " libjpeg")
 endif()
 
 # For registration to libraw_config.h
@@ -219,6 +229,7 @@ if(ENABLE_JASPER)
         add_definitions(-DUSE_JASPER)
         include_directories(${JASPER_INCLUDE_DIR})
         set(JASPER_SUPPORT_CAN_BE_COMPILED true)
+        string(APPEND LIBRAW_PC_REQUIRES_PRIVATE " jasper")
     endif()
 endif()
 
