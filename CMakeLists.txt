@@ -221,7 +221,7 @@ MACRO_BOOL_TO_01(OPENMP_SUPPORT_CAN_BE_COMPILED LIBRAW_USE_OPENMP)
 
 # Jasper library check
 set(JASPER_SUPPORT_CAN_BE_COMPILED false)
-if(ENABLE_JASPER)
+if(RAW_LIB_VERSION_STRING VERSION_LESS 0.22 AND ENABLE_JASPER)
     find_package(Jasper)
 
     # Flag to use libjasper with LibRaw RedCine codec
